@@ -2,16 +2,18 @@ import subprocess
 import read_hdf
 import translate
 import numpy as np
-
+import csv
 
 ####################### External data for make rho finding easier #######################
 
+categories = ['PS', 'V', 'T', 'AV', 'AT', 'S', 'ps', 'v', 't', 'av', 'at', 's']
+
 # Mesonic channels
-#mesonic_channels = ['g5', 'g1', 'g0g1', 'g5g1', 'g0g5g1', 'id']
-mesonic_channels = ['g5']
+mesonic_channels = ['g5', 'g1', 'g0g1', 'g5g1', 'g0g5g1', 'id']
+
 # Ensembles: M1, M2, M3, M4, M5
-#ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-ensembles = ['M1']
+ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
+
 # Roots in HDF5 for each ensemble
 roots = ['chimera_out_48x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
          'chimera_out_64x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
@@ -20,49 +22,36 @@ roots = ['chimera_out_48x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0
          'chimera_out_64x32x32x32nc4nf2nas3b6.5mf0.72mas1.01_APE0.4N50_smf0.24as0.12_s1']
 
 # Representations considered
-#reps = ['fund', 'anti']
-reps = ['fund']
+reps = ['fund', 'anti']
 
-Nsource_C_values_MN = {
-    'M1': [80,80,80,80,80,80,80,80,80,80,80,80],
-    'M2': [80,0,0,80,80,0,0,40,40,0,0,80],
-    'M3': [40,40,0,40,40,40,0,0,0,0,0,0],
-    'M4': [0,40,0,80,80,0,0,0,0,40,80,40],
-    'M5': [40,40,40,40,40,40,40,40,40,40,40,40]
-}
+# Initialize dictionaries to store the data
+Nsource_C_values_MN = {}
+Nsink_C_values_MN = {}
+am_C_values_MN = {}
+sigma1_over_mC_values_MN = {}
+sigma2_over_mC_values_MN = {}
 
-Nsink_C_values_MN = {
-    'M1': [40,40,40,40,40,40,40,40,40,40,40,40],
-    'M2': [40,40,40,40,40,40,40,80,40,40,40,80],
-    'M3': [0,40,40,0,40,40,40,40,40,40,40,40],
-    'M4': [40,40,40,40,40,40,40,40,40,40,40,40],
-    'M5': [40,40,40,40,40,40,40,40,40,40,40,40]
-}
+# Read data from CSV
+with open('metadata/metadata_spectralDensity.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        ensemble = row['Ensemble']
+        # Initialize lists for each ensemble if not already present
+        if ensemble not in Nsource_C_values_MN:
+            Nsource_C_values_MN[ensemble] = []
+            Nsink_C_values_MN[ensemble] = []
+            am_C_values_MN[ensemble] = []
+            sigma1_over_mC_values_MN[ensemble] = []
+            sigma2_over_mC_values_MN[ensemble] = []
+        # Append data for each category to the respective lists
+        for category in categories:
+            Nsource_C_values_MN[ensemble].append(int(row[f'{category}_Nsource']))
+            Nsink_C_values_MN[ensemble].append(int(row[f'{category}_Nsink']))
+            am_C_values_MN[ensemble].append(float(row[f'{category}_am']))
+            sigma1_over_mC_values_MN[ensemble].append(float(row[f'{category}_sigma1_over_m']))
+            sigma2_over_mC_values_MN[ensemble].append(float(row[f'{category}_sigma2_over_m']))
 
 
-am_C_values_MN = {
-    'M1': [0.3678, 0.4098, 0.4098, 0.5485, 0.5514, 0.5241, 0.60161, 0.6503, 0.6503, 0.8299, 0.8408, 0.7957],
-    'M2': [0.3656, 0.4054, 0.4054, 0.5423, 0.5429, 0.5222, 0.6007, 0.6473, 0.6473, 0.821, 0.834, 0.782],
-    'M3': [0.36658, 0.4083, 0.4083, 0.5352, 0.5486, 0.5165, 0.60131, 0.6492, 0.6492, 0.8349, 0.8430, 0.788],
-    'M4': [0.4096, 0.4484, 0.4484, 0.6016, 0.6141, 0.580, 0.62809, 0.6716, 0.6716, 0.8793, 0.8797, 0.854],
-    'M5': [0.31025, 0.3505, 0.3505, 0.5111, 0.5191, 0.4888, 0.57853, 0.6212, 0.6212, 0.7983, 0.8095, 0.7674]
-}
-
-sigma1_over_mC_values_MN = {
-    'M1': [0.33, 0.30, 0.30, 0.20, 0.18, 0.20, 0.18, 0.20, 0.30, 0.20, 0.18, 0.18],
-    'M2': [0.35, 0.28, 0.23, 0.30, 0.30, 0.30, 0.18, 0.20, 0.20, 0.18, 0.18, 0.18],
-    'M3': [0.30, 0.28, 0.33, 0.28, 0.30, 0.30, 0.23, 0.24, 0.28, 0.18, 0.25, 0.23],
-    'M4': [0.30, 0.30, 0.25, 0.25, 0.25, 0.25, 0.24, 0.23, 0.23, 0.20, 0.25, 0.24],
-    'M5': [0.25, 0.30, 0.30, 0.25, 0.20, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20, 0.20]
-}
-
-sigma2_over_mC_values_MN = {
-    'M1': [0.32, 0.22, 0.30, 0.18, 0.20, 0.20, 0.20, 0.26, 0.26, 0.18, 0.18, 0.20],
-    'M2': [0.30, 0.33, 0.23, 0.18, 0.20, 0.20, 0.18, 0.20, 0.20, 0.18, 0.23, 0.18],
-    'M3': [0.27, 0.25, 0.28, 0.32, 0.18, 0.24, 0.22, 0.25, 0.28, 0.25, 0.25, 0.23],
-    'M4': [0.30, 0.27, 0.25, 0.25, 0.25, 0.30, 0.24, 0.20, 0.25, 0.20, 0.25, 0.20],
-    'M5': [0.25, 0.30, 0.30, 0.20, 0.20, 0.25, 0.20, 0.25, 0.25, 0.20, 0.20, 0.20]
-}
 
 # Create a 3D matrix with ensemble index
 matrix_4D = [
@@ -251,3 +240,4 @@ for kernel in kerneltype:
                                 '--emin', emin,
                                 '--emax', emax,
                                 '--periodicity', periodicity])
+
