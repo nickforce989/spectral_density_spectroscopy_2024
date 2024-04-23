@@ -31,7 +31,7 @@ To reproduce all the plots that are shown in the papers, deriving from
 spectral density findings and GEVP (Figs. 1, 2, 3, 4, 5, 6, 8, 9, 14, 16, 17, 18, 19, 20), run ``bash run_plots.sh``. To do so,
 ensure that the CSVs in ``plateaus/CSVs`` are full.
 
-To find all the spectral densities that have been used in the paper,
+To find all the spectral densities from scratch and exactly how they have been used in the paper,
 ensure that the HDF5 file containing all the data is present in the 
 directory ``input_correlators/``, and then run ``bash run_spectral_densities.sh``.
 
@@ -41,9 +41,9 @@ Spectral density fits (Figs. 7, 15, 10 right panel, 11 right panel, 12 right pan
 Single plateaus fits (Figs. 10 left panel, 11 left panel, 12 left panel, 13 left panel) can be reproduced by using the example code
 in ``plateaus/check_meson.py``.
 
-To find all the GEVP plateaus results that are shown in the papers,
-run ``bash run_plateaus.sh``. Firstly, ensure that the HDF5 file containing 
-all the data is present in the  directory ``input_correlators/``.
+To find all the GEVP plateaus results from scratch, selecting the plateaus
+extents by hand, run ``bash run_plateaus.sh``. Firstly, ensure that the HDF5
+file containing all the data is present in the  directory ``input_correlators/``.
 
 ## Contributing
 
