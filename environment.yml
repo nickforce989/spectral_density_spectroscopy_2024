@@ -1,4 +1,4 @@
-name: base
+name: analysis-env
 channels:
   - defaults
 dependencies:
@@ -369,4 +369,3 @@ dependencies:
     - uncertainties==3.1.7
     - vegas==6.1
     - virtualenv==20.25.1
-prefix: /home/niccolo/anaconda3

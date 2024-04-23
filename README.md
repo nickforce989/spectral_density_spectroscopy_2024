@@ -8,11 +8,28 @@ reproduce the results in **(arXiv: ######)**.
 
 Niccolò Forzano, Ho Hsiao, Fabian Zierler
 
-## Usage
+
+## Set up environment
+
+Download this code and download the data release files in doi:######.zenodo.#########
+
+Then, create the conda environment in terminal with conda installed:
+
+```
+conda env create -f environment.yml
+```
+
+Once the environment is created, you can active it:
+
+```
+conda activate analysis-env
+```
+
+## Code usage
 
 To reproduce all the plots that are shown in the papers, deriving from 
 spectral density findings and GEVP, run ``bash run_plots.sh``. To do so,
-ensure that the CSVs in 'plateaus/CSVs' are full.
+ensure that the CSVs in ``plateaus/CSVs`` are full.
 
 To find all the spectral densities that have been used in the paper,
 ensure that the HDF5 file containing all the data is present in the 
