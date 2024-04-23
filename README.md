@@ -11,7 +11,7 @@ Niccolò Forzano, Ho Hsiao, Fabian Zierler
 
 ## Set up environment
 
-Download this code and download the data release files in doi:######.zenodo.#########
+Download this code and download the data release files in doi:10.5281/zenodo.11048346
 
 Then, create the conda environment in terminal with conda installed:
 
