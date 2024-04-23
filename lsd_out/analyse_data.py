@@ -7,18 +7,21 @@ import numpy as np
 ####################### External data for make rho finding easier #######################
 
 # Mesonic channels
-mesonic_channels = ['g5', 'g1', 'g0g1', 'g5g1', 'g0g5g1', 'id']
+#mesonic_channels = ['g5', 'g1', 'g0g1', 'g5g1', 'g0g5g1', 'id']
+mesonic_channels = ['g5']
 # Ensembles: M1, M2, M3, M4, M5
-ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
+#ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
+ensembles = ['M1']
 # Roots in HDF5 for each ensemble
 roots = ['chimera_out_48x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
-         'chimera_out_64x20x20x20b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
+         'chimera_out_64x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
          'chimera_out_96x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
          'chimera_out_64x20x20x20nc4nf2nas3b6.5mf0.70mas1.01_APE0.4N50_smf0.2as0.12_s1',
          'chimera_out_64x32x32x32nc4nf2nas3b6.5mf0.72mas1.01_APE0.4N50_smf0.24as0.12_s1']
 
 # Representations considered
-reps = ['fund', 'anti']
+#reps = ['fund', 'anti']
+reps = ['fund']
 
 Nsource_C_values_MN = {
     'M1': [80,80,80,80,80,80,80,80,80,80,80,80],
@@ -86,7 +89,7 @@ subprocess.run(['cd', 'lsdensities'], shell=True)
 subprocess.run(['pip', 'install', '-r', 'lsdensities/requirements.txt'])
 
 # Replace 'your_file.h5' with the path to your HDF5 file
-file_path = '../input_correlators/chimera_baryon_data.hdf5'
+file_path = '../input_correlators/chimera_data_full.hdf5'
 
 kerneltype = ['HALFNORMGAUSS', 'CAUCHY']
 
@@ -99,59 +102,105 @@ for kernel in kerneltype:
                 Nsink = matrix_4D[index][5][k]
                 ####################### Get correlators from HDF5 file #################################
                 if channel == 'g1':
-                    dataset_path1 = roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g1'
+                    dataset_path1 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g1'
                     dataset_path2 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g2'
-                    dataset_path3 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g3'
+                    dataset_path3 =  roots[index] + '/' +  f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g3'
+                    group1_1 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_1 = f'{rep} TRIPLET g1'
+                    group1_2 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_2 = f'{rep} TRIPLET g2'
+                    group1_3 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_3 = f'{rep} TRIPLET g3' 
 
-                    dataset1 = read_hdf.extract_dataset(file_path, dataset_path1)
-                    dataset2 = read_hdf.extract_dataset(file_path, dataset_path2)
-                    dataset3 = read_hdf.extract_dataset(file_path, dataset_path3)
+                    dataset1 = read_hdf.extract_dataset(file_path, group2_1, roots[index], group1_1)
+                    dataset2 = read_hdf.extract_dataset(file_path, group2_2, roots[index], group1_2)
+                    dataset3 = read_hdf.extract_dataset(file_path, group2_3, roots[index], group1_3)
+
                     with open('paths.log', 'a') as file:
                         print(dataset_path1, file=file)
-                    dataset = (dataset1 + dataset2 + dataset3)  / 3
-
+                    dataset = (dataset1 + dataset2 + dataset3) / 3
                     channel = 'gi'
+                    
+                    
                 elif channel == 'g0g1':
                     dataset_path1 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g0g1'
                     dataset_path2 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g0g2'
-                    dataset_path3 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g0g3'
-                    dataset1 = read_hdf.extract_dataset(file_path, dataset_path1)
-                    dataset2 = read_hdf.extract_dataset(file_path, dataset_path2)
-                    dataset3 = read_hdf.extract_dataset(file_path, dataset_path3)
+                    dataset_path3 =  roots[index] + '/' +  f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g0g3'
+                    group1_1 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_1 = f'{rep} TRIPLET g0g1'
+                    group1_2 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_2 = f'{rep} TRIPLET g0g2'
+                    group1_3 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_3 = f'{rep} TRIPLET g0g3' 
+
+                    dataset1 = read_hdf.extract_dataset(file_path, group2_1, roots[index], group1_1)
+                    dataset2 = read_hdf.extract_dataset(file_path, group2_2, roots[index], group1_2)
+                    dataset3 = read_hdf.extract_dataset(file_path, group2_3, roots[index], group1_3)
+
                     with open('paths.log', 'a') as file:
                         print(dataset_path1, file=file)
                     dataset = (dataset1 + dataset2 + dataset3) / 3
                     channel = 'g0gi'
-                elif channel == 'g5g1':
+                    
+                    
+                elif channel == 'g5g1':                    
                     dataset_path1 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g5g1'
                     dataset_path2 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g5g2'
-                    dataset_path3 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g5g3'
-                    dataset1 = read_hdf.extract_dataset(file_path, dataset_path1)
-                    dataset2 = read_hdf.extract_dataset(file_path, dataset_path2)
-                    dataset3 = read_hdf.extract_dataset(file_path, dataset_path3)
+                    dataset_path3 =  roots[index] + '/' +  f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g5g3'
+                    group1_1 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_1 = f'{rep} TRIPLET g5g1'
+                    group1_2 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_2 = f'{rep} TRIPLET g5g2'
+                    group1_3 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_3 = f'{rep} TRIPLET g5g3' 
+
+                    dataset1 = read_hdf.extract_dataset(file_path, group2_1, roots[index], group1_1)
+                    dataset2 = read_hdf.extract_dataset(file_path, group2_2, roots[index], group1_2)
+                    dataset3 = read_hdf.extract_dataset(file_path, group2_3, roots[index], group1_3)
+
                     with open('paths.log', 'a') as file:
                         print(dataset_path1, file=file)
                     dataset = (dataset1 + dataset2 + dataset3) / 3
                     channel = 'g5gi'
+                    
+                    
+                    
                 elif channel == 'g0g5g1':
+                
                     dataset_path1 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g0g5g1'
                     dataset_path2 =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g0g5g2'
                     dataset_path3 =  roots[index] + '/' +  f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g0g5g3'
-                    dataset1 = read_hdf.extract_dataset(file_path, dataset_path1)
-                    dataset2 = read_hdf.extract_dataset(file_path, dataset_path2)
-                    dataset3 = read_hdf.extract_dataset(file_path, dataset_path3)
+                    group1_1 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_1 = f'{rep} TRIPLET g0g5g1'
+                    group1_2 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_2 = f'{rep} TRIPLET g0g5g2'
+                    group1_3 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2_3 = f'{rep} TRIPLET g0g5g3' 
+
+                    dataset1 = read_hdf.extract_dataset(file_path, group2_1, roots[index], group1_1)
+                    dataset2 = read_hdf.extract_dataset(file_path, group2_2, roots[index], group1_2)
+                    dataset3 = read_hdf.extract_dataset(file_path, group2_3, roots[index], group1_3)
+
                     with open('paths.log', 'a') as file:
                         print(dataset_path1, file=file)
                     dataset = (dataset1 + dataset2 + dataset3) / 3
                     channel = 'g0g5gi'
-                elif channel == 'id':
+
+                elif channel == 'id':                  
                     dataset_path =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET id'
-                    dataset = read_hdf.extract_dataset(file_path, dataset_path)
+                    group1 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2 = f'{rep} TRIPLET id'
+
+                    dataset = read_hdf.extract_dataset(file_path, group2, roots[index], group1)
                     with open('paths.log', 'a') as file:
                         print(dataset_path, file=file)
+                        
                 elif channel == 'g5':
                     dataset_path =  roots[index] + '/' + f'source_N{Nsource}_sink_N{Nsink}/{rep} TRIPLET g5'
-                    dataset = read_hdf.extract_dataset(file_path, dataset_path)
+                    group1 = f'source_N{Nsource}_sink_N{Nsink}'
+                    group2 = f'{rep} TRIPLET g5'
+
+                    dataset = read_hdf.extract_dataset(file_path, group2, roots[index], group1)
                     with open('paths.log', 'a') as file:
                         print(dataset_path, file=file)
 
