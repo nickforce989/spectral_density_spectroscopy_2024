@@ -23,6 +23,8 @@ python different_kernels.py
 cd ../final_spectrum
 python spectrum_MN.py
 cd ../../../plateaus
+python check_meson.py
 python plot_GEVP_F.py
 python plot_GEVP_AS.py
+
 

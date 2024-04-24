@@ -32,7 +32,7 @@ ens_lb = {
     "chimera_out_64x32x32x32nc4nf2nas3b6.5mf0.72mas1.01_APE0.4N50_smf0.24as0.12_s1": "M5",
 }
 
-DATA = h5py.File("../input_correlators/chimera_data_full.hdf5")
+DATA = h5py.File("../tmp_data/chimera_data_full.hdf5")
 
 CSV_data = []
 CHs = [
@@ -46,7 +46,7 @@ CHs = [
 
 CHs_tag = ["g5", "gi", "g0gi", "g5gi", "g0g5gi", "id"]
 
-file_path = "../input_correlators/chimera_data_full.hdf5"
+DATA = h5py.File("../tmp_data/chimera_data_full.hdf5")
 
 
 savename = "metadata/mesonF_meta.csv"
@@ -80,7 +80,7 @@ for ens_tag in log_name:
 
     Nt = int(ens.split("x")[0])
     Ns = int(ens.split("x")[0])
-    bebeta = float(ens.split("b")[1].split("m")[0])
+    beta = float(ens.split("b")[1].split("m")[0])
     f_bare_mass = ens_group["quarkmasses_fundamental"][0]
     epsilon_f = ens_group["Wuppertal_eps_fund"][0]
 
@@ -95,7 +95,7 @@ for ens_tag in log_name:
             for j in range(len(ch)):
                 tmp_bin.append(
                     read_hdf.get_meson_corr(
-                        file_path, ens_tag, "fund", Nsource, Nsink, ch[j]
+                        DATA, ens_tag, "fund", Nsource, Nsink, ch[j]
                     )
                 )
 

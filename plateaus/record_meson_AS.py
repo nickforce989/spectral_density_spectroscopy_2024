@@ -32,7 +32,7 @@ ens_lb = {
     "chimera_out_64x32x32x32nc4nf2nas3b6.5mf0.72mas1.01_APE0.4N50_smf0.24as0.12_s1": "M5",
 }
 
-DATA = h5py.File("../input_correlators/chimera_data_full.hdf5")
+DATA = h5py.File("../tmp_data/chimera_data_full.hdf5")
 
 CSV_data = []
 CHs = [
@@ -46,10 +46,8 @@ CHs = [
 
 CHs_tag = ["g5", "gi", "g0gi", "g5gi", "g0g5gi", "id"]
 
-file_path = "../input_correlators/chimera_data_full.hdf5"
 
-
-savename = "metadata/mesonF_meta.csv"
+savename = "metadata/mesonAS_meta.csv"
 n = 0
 if os.path.isfile(savename):
     meta = pd.read_csv(savename)
@@ -82,15 +80,14 @@ for ens_tag in log_name:
     Ns = int(ens.split("x")[0])
     beta = float(ens.split("b")[1].split("m")[0])
     f_bare_mass = -float(ens_tag.split("mf")[1].split("mas")[0])  # to add the attrs
-    # as_bare_mass = float(list(ens_group.get(list(ens_group.keys())[0]).keys())[0][3:])
-
+    
     SMEARs = list(ens_group.keys())
 
     # SMEARs[0].split('_')[1][1:]
 
     epsilon_f = ens_tag.split("smf")[1].split("as")[
         0
-    ]  # ens_group['source_N'+N_source+'_sink_N0_fund'].attrs['epsilon']
+    ]  
 
     data_tmp = []
     data_tmp.extend((ens, Nt, Ns, beta, f_bare_mass, epsilon_f, Nsource))
@@ -103,7 +100,7 @@ for ens_tag in log_name:
             for j in range(len(ch)):
                 tmp_bin.append(
                     read_hdf.get_meson_corr(
-                        file_path, ens_tag, "fund", Nsource, Nsink, ch[j]
+                        DATA, ens_tag, "anti", Nsource, Nsink, ch[j]
                     )
                 )
 
@@ -118,7 +115,7 @@ for ens_tag in log_name:
                 CHs_tag[i] + " [" + str(Nsource) + "," + str(Nsink) + "]",
             )
 
-        plt.ylim(0.3, 0.5)
+        plt.ylim(0.4, 0.8)
         plt.xlim(0, Nt / 2)
         extract.sperater.reset()
 

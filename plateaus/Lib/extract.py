@@ -228,8 +228,10 @@ def Analysis_Mass_eff_cosh(C_resample, ti, tf, measurement):
     plt.errorbar(
         T_dot[select] + sprnext,
         mass_tmp[select],
-        err_tmp[select],
+        1.5*err_tmp[select],
         linestyle="",
+        elinewidth=2.0,
+        capsize=2,
         marker=mk,
         alpha=0.6,
         label=measurement,
@@ -238,8 +240,10 @@ def Analysis_Mass_eff_cosh(C_resample, ti, tf, measurement):
     plt.errorbar(
         T_dot[~select] + sprnext,
         mass_tmp[~select],
-        err_tmp[~select],
+        1.5*err_tmp[~select],
         linestyle="",
+        elinewidth=2.0,
+        capsize=2,
         marker=mk,
         color=plt.gca().lines[-1].get_color(),
         alpha=0.1,
