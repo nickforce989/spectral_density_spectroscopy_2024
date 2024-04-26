@@ -31,7 +31,7 @@ conda activate analysis-env
 
 To reproduce all the plots that are shown in the papers, deriving from 
 spectral density findings and GEVP (Figs. 1, 2, 3, 4, 5, 6, 8, 9, 14, 16, 17, 18, 19, 20, 10 left panel, 11 left panel, 12 left panel, 13 left panel), run 
-``bash run_plots.sh``. To do so, ensure that the CSVs in ``plateaus/CSVs`` are full. Please, also ensure that ``
+``bash run_plots.sh``. To do so, ensure that the CSVs in ``plateaus/CSVs`` are full. Please, also ensure that ``input_topology`` is full.
 
 To find all the spectral densities from scratch and exactly how they have been used in the paper,
 ensure that the HDF5 file containing all the data is present in the 
