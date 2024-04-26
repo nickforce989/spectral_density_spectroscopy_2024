@@ -9,7 +9,7 @@ gr(fontfamily="Computer Modern", frame=:box, top_margin=4Plots.mm, left_margin=4
 gr(tickfontsize=10,labelfontsize=12,titlefontsize=14)
 println("Plaquette autocorrelation...")
 
-files  = readdir("../input/plaquettes",join=true) 
+files  = readdir("../../../../input_topology/plaquettes",join=true) 
 param = readdlm("../output/tables/table1_machine_readable.csv",',',skipstart=1)
 
 therms = Int.(param[:,12])
