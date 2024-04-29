@@ -1,4 +1,3 @@
-import subprocess
 import read_hdf
 import translate
 import numpy as np
