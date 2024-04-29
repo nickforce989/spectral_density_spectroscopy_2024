@@ -102,11 +102,11 @@ def process_channel(channel, k, index, rep, ensemble, kernel, matrix_4D, roots, 
     decimal_as_int = int(decimal_part * 100)
     datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
     outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
-    ne = '15'
+    ne = '1'
     emin = '0.3'
     emax = '2.2'
     periodicity = 'COSH'
-    subprocess.run(['python', 'lsdensities/examples/runInverseProblem.py',
+    subprocess.run(['python', './runInverseProblem.py',
                     '-datapath', datapath,
                     '--outdir', outdir,
                     '--kerneltype', kernel,
@@ -117,12 +117,6 @@ def process_channel(channel, k, index, rep, ensemble, kernel, matrix_4D, roots, 
                     '--emax', emax,
                     '--periodicity', periodicity])
 ################# Download and use lsdensities on correlators ########################
-# Clone the repository
-subprocess.run(['git', 'clone', 'https://github.com/LupoA/lsdensities.git'])
-# Change into the cloned directory
-subprocess.run(['cd', 'lsdensities'], shell=True)
-# Install the required dependencies
-subprocess.run(['pip', 'install', '-r', 'lsdensities/requirements.txt'])
 # Replace 'your_file.h5' with the path to your HDF5 file
 file_path = '../input_correlators/chimera_data_full.hdf5'
 for kernel in kerneltype:
