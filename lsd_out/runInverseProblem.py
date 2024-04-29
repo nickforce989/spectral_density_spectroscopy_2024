@@ -18,36 +18,36 @@ from lsdensities.utils.rhoUtils import MatrixBundle
 import random
 
 
-def init_variables(args_):
+def init_variables(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi):
     in_ = Inputs()
-    in_.tmax = args_.tmax
-    in_.periodicity = args_.periodicity
-    in_.kerneltype = args_.kerneltype
-    in_.prec = args_.prec
-    in_.datapath = args_.datapath
-    in_.outdir = args_.outdir
-    in_.massNorm = args_.mpi
-    in_.num_boot = args_.nboot
-    in_.sigma = args_.sigma
+    in_.tmax = 0
+    in_.periodicity = periodicity
+    in_.kerneltype = kernel
+    in_.prec = prec
+    in_.datapath = datapath
+    in_.outdir = outdir
+    in_.massNorm = mpi
+    in_.num_boot = nboot
+    in_.sigma = sigma
     in_.emax = (
-        args_.emax * args_.mpi
+        emax * mpi
     )  #   we pass it in unit of Mpi, here to turn it into lattice (working) units
-    if args_.emin == 0:
-        in_.emin = (args_.mpi / 20) * args_.mpi
+    if emin == 0:
+        in_.emin = (mpi / 20) * mpi
     else:
-        in_.emin = args_.emin * args_.mpi
-    in_.e0 = args_.e0
-    in_.Ne = args_.ne
-    in_.Na = args_.Na
-    in_.A0cut = args_.A0cut
+        in_.emin = emin * mpi
+    in_.e0 = e0
+    in_.Ne = ne
+    in_.Na = Na
+    in_.A0cut = A0cut
     return in_
 
 
-def main():
+def findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi):
     print(LogMessage(), "Initialising")
-    args = parseArgumentRhoFromData()
-    init_precision(args.prec)
-    par = init_variables(args)
+    #args = parseArgumentRhoFromData()
+    init_precision(prec)
+    par = init_variables(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi)
 
     seed = generate_seed(par)
     random.seed(seed)
@@ -55,6 +55,7 @@ def main():
 
     #   Reading datafile, storing correlator
     rawcorr, par.time_extent, par.num_samples = u.read_datafile(par.datapath)
+    par.tmax = int(par.time_extent / 2) 
     par.assign_values()
     par.report()
     par.plotpath, par.logpath = create_out_paths(par)
@@ -136,7 +137,3 @@ def main():
     )  # Lots of plots as it is
     HLT.plotResult()
     end()
-
-
-if __name__ == "__main__":
-    main()

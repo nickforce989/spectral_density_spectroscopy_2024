@@ -4,6 +4,7 @@ import translate
 import numpy as np
 import csv
 import multiprocessing
+from runInverseProblem import init_variables, findRho
 ####################### External data for make rho finding easier #######################
 categories = ['PS', 'V', 'T', 'AV', 'AT', 'S', 'ps', 'v', 't', 'av', 'at', 's']
 # Mesonic channels
@@ -96,26 +97,22 @@ def process_channel(channel, k, index, rep, ensemble, kernel, matrix_4D, roots, 
             tmp = mpi * matrix_4D[index][3][k]
         else:
             tmp = mpi * matrix_4D[index][3][k + 6]
-    mpi = str(mpi)
-    sigma = str(tmp)
+    mpi = mpi
+    sigma = tmp
     decimal_part = tmp / matrix_4D[index][1][k] % 1
     decimal_as_int = int(decimal_part * 100)
     datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
     outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
-    ne = '1'
-    emin = '0.3'
-    emax = '2.2'
+    ne = 1
+    emin = 0.3
+    emax = 2.2
     periodicity = 'COSH'
-    subprocess.run(['python', './runInverseProblem.py',
-                    '-datapath', datapath,
-                    '--outdir', outdir,
-                    '--kerneltype', kernel,
-                    '--mpi', mpi,
-                    '--sigma', sigma,
-                    '--ne', ne,
-                    '--emin', emin,
-                    '--emax', emax,
-                    '--periodicity', periodicity])
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 1
+    A0cut = 0.1
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi)
 ################# Download and use lsdensities on correlators ########################
 # Replace 'your_file.h5' with the path to your HDF5 file
 file_path = '../input_correlators/chimera_data_full.hdf5'
