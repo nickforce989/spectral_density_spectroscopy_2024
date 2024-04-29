@@ -111,7 +111,7 @@ plt.xlabel('$E/m_{\mathrm{V}}$', fontsize=14)
 plt.tight_layout()
 
 plt.savefig(
-            '../../../plots/two_kernels_comparisons.png',
+            '../../../plots/two_kernels_comparisons.pdf',
             dpi=130, bbox_inches='tight'
         )
 

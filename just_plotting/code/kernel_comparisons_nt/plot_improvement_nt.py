@@ -109,7 +109,7 @@ plt.xlabel('$E/m_V$', fontsize=14)
 plt.tight_layout()
 
 plt.savefig(
-            '../../../plots/kernel_comparison.png',
+            '../../../plots/kernel_comparison.pdf',
             dpi=130, bbox_inches='tight'
         )
 

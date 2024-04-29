@@ -77,7 +77,7 @@ def plot_stability_multiple_alpha(log_files, save_plot=True, n_alphas=2):
     plt.tight_layout()
     plt.suptitle('$\omega/m_{\mathrm{V}} = 1.25$ $\sigma = 0.30m_{\mathrm{V}}$',fontsize=14, y=0.99)
     if save_plot:
-        plt.savefig("../../../plots/LambdaScan.png", dpi=300)
+        plt.savefig("../../../plots/LambdaScan.pdf", dpi=300)
     
     #plt.show()
 
