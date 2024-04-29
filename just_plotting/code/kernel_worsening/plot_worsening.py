@@ -49,7 +49,7 @@ def gauss_fp(x, x0, sigma, norm="Full"):
         return (np.exp(-((x - x0) ** 2) / (2 * sigma**2))) / halfnorm_fp(x0, sigma)
 
 # Create subplots
-fig, axs = plt.subplots(3, 1, figsize=(5.8, 5.5))
+fig, axs = plt.subplots(3, 1, figsize=(6.9, 5.5))
 
 # Plot the y_to_plot curves
 y_to_plot1 = gauss_fp(energies, omega, 0.28*massNorm, norm="half")
@@ -61,7 +61,7 @@ axs[0].plot(
     energies / massNorm,
     y_to_plot1,
     ls='--',
-    label='$\Delta_\sigma$ at $\omega / m_V \\approx 1.0$',
+    label='$\Delta_\sigma$ at $\omega / m_{\mathrm{V}} \\approx 1.0$',
     color='red',
     linewidth=1.8,
 )
@@ -69,7 +69,7 @@ axs[1].plot(
     energies / massNorm,
     y_to_plot2,
     ls='-.',
-    label='$\Delta_\sigma$ at $\omega / m_V \\approx 1.5$',
+    label='$\Delta_\sigma$ at $\omega / m_{\mathrm{V}} \\approx 1.5$',
     color='red',
     linewidth=1.8,
 )
@@ -77,7 +77,7 @@ axs[2].plot(
     energies / massNorm,
     y_to_plot3,
     ls=':',
-    label='$\Delta_\sigma$ at $\omega / m_V \\approx 1.9$',
+    label='$\Delta_\sigma$ at $\omega / m_{\mathrm{V}} \\approx 1.9$',
     color='red',
     linewidth=1.8,
 )
@@ -128,11 +128,15 @@ axs[2].plot(
 
 
 # Add legend and labels
-axs[2].set_xlabel('$E/m_V$', fontsize=14)
+axs[2].set_xlabel('$E/m_{\mathrm{V}}$', fontsize=14)
 plt.tight_layout()
 axs[0].legend()
 axs[1].legend()
 axs[2].legend()
+
+axs[0].grid(linestyle='--')
+axs[1].grid(linestyle='--')
+axs[2].grid(linestyle='--')
 
 plt.savefig(
     '../../../plots/kernel_comparison.png',

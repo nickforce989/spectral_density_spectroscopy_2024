@@ -63,7 +63,7 @@ plt.plot(
     markersize=6.8,
     ls="--",
     linewidth=1.6,
-    label="Gauss Ker. at $\omega / m_V = 0.6$".format(omega / massNorm),
+    label="Gauss Ker. at $\omega / m_\mathrm{V} = 0.6$",
     color='black',
     markerfacecolor=CB_color_cycle[1],  # Replace with the actual color
 )
@@ -76,12 +76,12 @@ plt.plot(
     markersize=6.8,
     ls="--",
     linewidth=1.6,
-    label="Cauchy Ker. at $\omega / m_V = 0.6$".format(omega / massNorm),
+    label="Cauchy Ker. at $\omega / m_\mathrm{V} = 0.6$",
     color='black',
     markerfacecolor=CB_color_cycle[0],  # Replace with the actual color
 )
 
-plt.title("$\quad \\alpha = 0.0 \quad \sigma = 0.40m_V$", fontsize=13)
+plt.title("$\quad \\alpha = 0.0 \quad \sigma = 0.40m_{\mathrm{V}}$", fontsize=13)
 y_to_plot = gauss_fp(energies, omega, 0.40*massNorm, norm="half")
 y_to_plot2 = cauchy(energies, omega, 0.40*massNorm)
 
@@ -106,7 +106,8 @@ plt.plot(
 
 # Add legend and labels
 plt.legend(fontsize=12,frameon=False)
-plt.xlabel('$E/m_V$', fontsize=14)
+plt.grid(linestyle='--')
+plt.xlabel('$E/m_{\mathrm{V}}$', fontsize=14)
 plt.tight_layout()
 
 plt.savefig(

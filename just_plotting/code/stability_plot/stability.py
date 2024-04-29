@@ -68,14 +68,14 @@ def plot_stability_multiple_alpha(log_files, save_plot=True, n_alphas=2):
     ax[0].set_xscale('log')
     ax[0].grid()
 
-    ax[1].set_xlabel(r"$A[\vec{g}_{\lambda}] / A_0$", fontsize=14)
+    ax[1].set_xlabel(r"$A[\vec{g}] / A_0$", fontsize=14)
     ax[1].set_ylabel(r"$\hat{\rho}_\sigma (\omega)$", fontsize=14)
     ax[1].legend(prop={"size": 14, "family": "Helvetica"})
     ax[1].set_xscale('log')
     ax[1].grid()
 
     plt.tight_layout()
-    plt.suptitle('$\omega/m_V = 1.25$ $\sigma = 0.30m_V$',fontsize=14, y=0.99)
+    plt.suptitle('$\omega/m_{\mathrm{V}} = 1.25$ $\sigma = 0.30m_{\mathrm{V}}$',fontsize=14, y=0.99)
     if save_plot:
         plt.savefig("../../../plots/LambdaScan.png", dpi=300)
     
