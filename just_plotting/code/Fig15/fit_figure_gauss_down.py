@@ -68,5 +68,5 @@ plt.legend(fontsize=12)
 # Show plot
 #plt.show()
 
-plt.savefig('../../../plots/fit_results_NEWPAUL_nt96_fund_g5_double_2.png', dpi=130, bbox_inches='tight')
+plt.savefig('../../../plots/fit_results_NEWPAUL_nt96_fund_g5_double_2.pdf', dpi=130, bbox_inches='tight')
 

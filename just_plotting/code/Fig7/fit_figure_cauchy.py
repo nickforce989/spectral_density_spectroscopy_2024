@@ -68,6 +68,6 @@ plt.grid(linestyle='--')
 #plt.show()
 
 plt.savefig(
-            '../../../plots/fit_results_NEWPAUL_nt64_cauchy_as_gi_double_2.png',
+            '../../../plots/fit_results_NEWPAUL_nt64_cauchy_as_gi_double_2.pdf',
             dpi=130, bbox_inches='tight'
         )

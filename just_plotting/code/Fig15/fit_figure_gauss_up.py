@@ -66,6 +66,6 @@ plt.legend(fontsize=12)
 #plt.show()
 
 plt.savefig(
-            '../../../plots/fit_results_NEWPAUL_nt48_fund_g5_double_2.png',
+            '../../../plots/fit_results_NEWPAUL_nt48_fund_g5_double_2.pdf',
             dpi=130, bbox_inches='tight'
         )

@@ -65,6 +65,6 @@ plt.grid(linestyle='--')
 #plt.show()
 
 plt.savefig(
-            '../../../plots/fit_PAUL_gi_fund_N20_N20_double_2.png',
+            '../../../plots/fit_PAUL_gi_fund_N20_N20_double_2.pdf',
             dpi=130, bbox_inches='tight'
         )
