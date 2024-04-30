@@ -31,20 +31,22 @@ conda activate analysis-env
 
 ## Code usage
 
-To reproduce all the plots that are shown in the papers, deriving from 
-spectral density findings and GEVP (Figs. 1, 2, 3, 4, 5, 6, 8, 9, 14, 16, 17, 18, 19, 20, 10 left panel, 11 left panel, 12 left panel, 13 left panel), run 
+To reproduce all the plots that are shown in the papers, run 
 ``bash run_plots.sh``. To do so, ensure that the CSVs in ``plateaus/CSVs`` are full. Please, also ensure that ``input_topology/`` is full.
 
 To find all the spectral densities from scratch and exactly how they have been used in the paper,
 ensure that the HDF5 file containing all the data is present in the 
 directory ``input_correlators/``, and then run ``bash run_spectral_densities.sh``.
 
-Spectral density fits (Figs. 7, 15, 10 right panel, 11 right panel, 12 right panel, 13 right panel) can be reproduced by using the example code in LSDensities 
-``lsd_out/lsdensities/examples/runFitRho.py``.
+Spectral density fits can be reproduced by using ``lsd_out/fit_data.py``.
 
 To find all the GEVP plateaus results from scratch, selecting the plateaus
 extents by hand, run ``bash run_plateaus.sh``. Firstly, ensure that the HDF5
 file containing all the data is present in the  directory ``input_correlators/``.
+
+## Acknoledgement
+
+The flow_analysis code in 'topologies/flow_analysis' has been based on the following <a href="https://github.com/edbennett/flow_analysis/"> GitHub repository </a>.
 
 ## License
 

@@ -22,9 +22,23 @@ cd ../two_kernels
 python different_kernels.py
 cd ../final_spectrum
 python spectrum_MN.py
+cd ../Fig7
+python3 fit_figure_gauss.py
+python3 fit_figure_cauchy.py
+cd ../Fig10
+python3 fit_figure_gauss.py
+cd ../Fig11
+python3 fit_figure_gauss_up.py
+python3 fit_figure_gauss_down.py
+cd ../Fig12
+python3 fit_figure_gauss.py
+cd ../Fig13
+python3 fit_figure_gauss.py
+cd ../Fig15
+python3 fit_figure_gauss_up.py
+python3 fit_figure_gauss_middle.py
+python3 fit_figure_gauss_down.py
 cd ../../../plateaus
 python check_meson.py
 python plot_GEVP_F.py
 python plot_GEVP_AS.py
-
-
