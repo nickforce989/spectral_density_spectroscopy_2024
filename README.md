@@ -41,12 +41,14 @@ directory ``input_correlators/``, and then run ``bash run_spectral_densities.sh`
 Spectral density fits can be reproduced by using ``lsd_out/fit_data.py``.
 
 To find all the GEVP plateaus results from scratch, selecting the plateaus
-extents by hand, run ``bash run_plateaus.sh``. Firstly, ensure that the HDF5
+extents by hand, run ``bash self_finding_plateaus.sh``. Firstly, ensure that the HDF5
 file containing all the data is present in the  directory ``input_correlators/``.
+The command ``bash run_plateaus.sh``, instead, reproduces the plateaus by using the 
+metadata used for the analysis in the paper. 
 
 ## Acknoledgement
 
-The flow_analysis code in 'topologies/flow_analysis' has been based on the following <a href="https://github.com/edbennett/flow_analysis/"> GitHub repository </a>.
+The flow_analysis code in ```topologies/flow_analysis``` has been based on the following <a href="https://github.com/edbennett/flow_analysis/"> GitHub repository </a>.
 
 ## License
 
