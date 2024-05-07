@@ -1,8 +1,8 @@
-# Analysis code for (arXiv: ######)
+# Analysis code for (arXiv:2405.01388)
 
 This is the analysis code built on top of **lsdensities** code (
 <a href="https://github.com/LupoA/lsdensities"> GitHub repository </a>) to
-reproduce the results in **(arXiv: ######)**.
+reproduce the results in **(arXiv:2405.01388)**.
 
 ## Authors
 
