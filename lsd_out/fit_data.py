@@ -5,90 +5,176 @@ import matplotlib.pyplot as plt
 import os
 from lmfit import Parameters, Minimizer
 from lsdensities.utils.rhoUtils import LogMessage
+import csv
+from scipy.optimize import curve_fit
+import multiprocessing
+import csv
+
+# Plot x-limits
+plot_min_lim = 0.20
+plot_max_lim = 2.55
+
+def read_csv():
+    ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
+    categories = ['PS', 'V', 'T', 'AV', 'AT', 'S', 'ps', 'v', 't', 'av', 'at', 's']
+    Nsource_C_values_MN = {}
+    Nsink_C_values_MN = {}
+    am_C_values_MN = {}
+    sigma1_over_mC_values_MN = {}
+    sigma2_over_mC_values_MN = {}
+    k_peaks = {}    # kpeaks[ensemble][channel]
+    Nboot_fit = []
+    with open('metadata/metadata_spectralDensity.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            ensemble = row['Ensemble']
+            # Initialize lists for each ensemble if not already present
+            if ensemble not in Nsource_C_values_MN:
+                Nsource_C_values_MN[ensemble] = []
+                Nsink_C_values_MN[ensemble] = []
+                am_C_values_MN[ensemble] = []
+                sigma1_over_mC_values_MN[ensemble] = []
+                sigma2_over_mC_values_MN[ensemble] = []
+                k_peaks[ensemble] = []
 
 
-def main():
-    ############################# Settings #############################################
-    path = "./results/tmax24sigma0.12Ne5nboot300mNorm0.4prec105Na1/Logs/"
-    file_path_input = "./corr_NEWPAUL_out_s0p30/tmax24sigma0.12Ne5nboot300mNorm0.4prec105Na1/Logs/ResultHLT.txt"
-    output_name = "./fitresults/fit_results_NEWPAUL_nt64_mf0p72_as_g0gi_double.pdf"
+            Nboot_fit.append(int(row['Nboot_fit']))
+            # Append data for each category to the respective lists
+            for category in categories:
+                Nsource_C_values_MN[ensemble].append(int(row[f'{category}_Nsource']))
+                Nsink_C_values_MN[ensemble].append(int(row[f'{category}_Nsink']))
+                am_C_values_MN[ensemble].append(float(row[f'{category}_am']))
+                sigma1_over_mC_values_MN[ensemble].append(float(row[f'{category}_sigma1_over_m']))
+                sigma2_over_mC_values_MN[ensemble].append(float(row[f'{category}_sigma2_over_m']))
+                k_peaks[ensemble].append(int(row[f'{category}_k_peaks']))
 
-    # Plot x-limits
-    plot_min_lim = 0.20
-    plot_max_lim = 2.15
+    # Create a 3D matrix with ensemble index
+    matrix_4D = [
+        [
+            ensemble,
+            am_C_values_MN[ensemble],
+            sigma1_over_mC_values_MN[ensemble],
+            sigma2_over_mC_values_MN[ensemble],
+            Nsource_C_values_MN[ensemble],
+            Nsink_C_values_MN[ensemble]
+        ]
+        for ensemble in ensembles
+    ]
+    return matrix_4D, k_peaks, Nboot_fit
+def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks, kerneltype, nboot, fit_peaks_switch):
     ####################################################################################
-    ########################### Preferences ################################
-    # If you want to fit with Cauchy (False == Gaussians)
-    cauchy_fit = True
-    # If both false, it's two Gaussians/Cauchy fit
-    triple_fit = False
-    four_fit = False
-    print_cov_matrix = False
-    plot_cov_mat = False
-    plot_corr_mat = False
-    flag_chi2 = True  # To compute and show the correlated chi-square
-
-    if four_fit is True:
-        triple_fit = True
-    ####################################################################################
-    #####################Fitting initial parameter guesses #############################
-    params = Parameters()
-    params.add("amplitude_1", value=1.1882567280595472e-07, min=0.0)
-    params.add("mean_1", value=1.0, min=0.97, max=1.03)
-    params.add("amplitude_2", value=1.5101807628190783e-07, min=0.0)
-    params.add("mean_2", value=1.45, min=1.25, max=1.6)
-    if triple_fit is True:
-        params.add("amplitude_3", value=2.608025553079287e-06, min=0.0)
-        params.add("mean_3", value=2.5, min=2.2, max=2.7)
-    if four_fit is True:
-        params.add("amplitude_4", value=4.875793098794379e-10, min=0, max=1e-10)
-        params.add("mean_4", value=2.5, min=2.5, max=2.8)
-    #####################################################################################
+    '''
     # Extract directory path
     directory = os.path.dirname(output_name)
-
     # Check if directory exists, if not, create it
     if not os.path.exists(directory):
         os.makedirs(directory)
+    '''
 
-    # Check if the provided channel is valid
-    valid_channels = ["PS", "V", "T", "AV", "AT", "S"]
-    if channel not in valid_channels:
-        print("Please insert a valid mesonic channel!")
-        sys.exit("Error: Invalid channel")
+    # Update values if matches are found, matrix_4D[ensemble_num, object, channel_num], object = 1 --> mpi, 2 --> sigma
+    mpi = matrix_4D[ensemble_num][1][channel_num]
 
-    # Check if the provided representation is valid
-    valid_repr = ["fund", "as"]
-    if representation not in valid_repr:
-        print("Please insert a valid mesonic representation!")
-        sys.exit("Error: Invalid representation")
+    if kerneltype == 'GAUSS':
+        sigma = matrix_4D[ensemble_num][2][channel_num]
+    else:
+        sigma = matrix_4D[ensemble_num][3][channel_num]
+    # Define the Gaussian function
+    def gaussian(x, amplitude, mean):
+        return amplitude * np.exp(-((x - mean) ** 2) / (2 * sigma ** 2))
 
-    # Extract sigma and mpi from the path using regular expressions
-    sigma_match = re.search(r"sigma([\d.]+)", path)
-    mpi_match = re.search(r"mNorm([\d.]+)", path)
-    nboot_match = re.search(r"nboot([\d.]+)", path)
-    # Update values if matches are found
-    if sigma_match:
-        sigma = float(sigma_match.group(1))
+    # Define the sum of two Gaussian functions
+    def double_gaussian(x, params):
+        amplitude_1 = params["amplitude_1"].value
+        mean_1 = params["mean_1"].value
+        amplitude_2 = params["amplitude_2"].value
+        mean_2 = params["mean_2"].value
 
-    if mpi_match:
-        mpi = float(mpi_match.group(1))
+        model = gaussian(x, amplitude_1, mean_1) + gaussian(x, amplitude_2, mean_2)
+        return model
 
-    if nboot_match:
-        nboot = int(nboot_match.group(1))
+    def double_gaussian2(x, amplitude1, mean1, amplitude2, mean2):
+        model = gaussian(x, amplitude1, mean1) + gaussian(x, amplitude2, mean2)
+        return model
+
+    def triple_gaussian2(x, amplitude1, mean1, amplitude2, mean2, amplitude3, mean3):
+        model = (
+                gaussian(x, amplitude1, mean1)
+                + gaussian(x, amplitude2, mean2)
+                + gaussian(x, amplitude3, mean3)
+        )
+        return model
+
+    def four_gaussian2(
+            x, amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, amplitude4, mean4
+    ):
+        model = (
+                gaussian(x, amplitude1, mean1)
+                + gaussian(x, amplitude2, mean2)
+                + gaussian(
+            x,
+            amplitude3,
+            mean3,
+        )
+                + gaussian(x, amplitude4, mean4)
+        )
+        return model
+
+    #######################################################################
+    # Cauchy functions
+    def cauchy(x, amplitude, mean):
+        return amplitude * (sigma / ((x - mean) ** 2 + sigma ** 2))
+
+    def double_cauchy(x, params):
+        amplitude_1 = params["amplitude_1"].value
+        mean_1 = params["mean_1"].value
+        amplitude_2 = params["amplitude_2"].value
+        mean_2 = params["mean_2"].value
+
+        model = cauchy(x, amplitude_1, mean_1) + cauchy(x, amplitude_2, mean_2)
+        return model
+
+    def double_cauchy2(x, amplitude1, mean1, amplitude2, mean2):
+        model = cauchy(x, amplitude1, mean1) + cauchy(x, amplitude2, mean2)
+        return model
+
+    def triple_cauchy2(x, amplitude1, mean1, amplitude2, mean2, amplitude3, mean3):
+        model = (
+                cauchy(x, amplitude1, mean1)
+                + cauchy(x, amplitude2, mean2)
+                + cauchy(x, amplitude3, mean3)
+        )
+        return model
+
+    def four_cauchy2(
+            x, amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, amplitude4, mean4
+    ):
+        model = (
+                cauchy(x, amplitude1, mean1)
+                + cauchy(x, amplitude2, mean2)
+                + cauchy(
+            x,
+            amplitude3,
+            mean3,
+        )
+                + cauchy(x, amplitude4, mean4)
+        )
+        return model
 
     # Smearing radius in ratio with Mpi
-    sigma /= mpi
-
+    print(LogMessage(), "################### General Fit info #############################")
+    if fit_peaks_switch == 0:
+        print(LogMessage(), f"Ens: {ensemble}, Repr: {rep}, Channel: {channel}, Kernel: {kernel}, No. Peaks: {old_k_peaks}")
+    elif fit_peaks_switch == 1:
+        print(LogMessage(),
+              f"Ens: {ensemble}, Repr: {rep}, Channel: {channel}, Kernel: {kernel}, No. Peaks: {new_k_peaks}")
+    print(LogMessage(), 'sigma:', sigma)
+    print(LogMessage(), 'mpi: ',mpi)
+    print(LogMessage(), '##################################################################')
     # Get a list of all the file names in the directory
     file_names = os.listdir(path)
-
-    # Filter the file names to include only those starting with 'lsdensitiesamplesE'
-    file_names = [
-        file_name
-        for file_name in file_names
-        if file_name.startswith("lsdensitiesamplesE")
-    ]
+    file_names = sorted(file_names, key=lambda x: float(x.split("E")[1].split("sig")[0]))
+    #print(file_names)
 
     # Extract the energy values from the file names
     energies = [file_name.split("E")[1].split("sig")[0] for file_name in file_names]
@@ -104,20 +190,20 @@ def main():
     amplitude_vals2 = []
     mean_vals2 = []
 
-    if triple_fit is True:
-        amplitude_vals3 = []
-        mean_vals3 = []
 
-    if four_fit is True:
-        amplitude_vals4 = []
-        mean_vals4 = []
+    amplitude_vals3 = []
+    mean_vals3 = []
+
+
+    amplitude_vals4 = []
+    mean_vals4 = []
 
     # Create an empty matrix
     rho_resampled = np.zeros((nboot, ne))
-
+    #print()
     # Fill the matrix using the values from the files
     for i, energy in enumerate(energies):
-        file_name = f"lsdensitiesamplesE{energy}sig{sigma*mpi}"
+        file_name = file_names[i]
         file_path = os.path.join(path, file_name)
         with open(file_path, "r") as file:
             lines = file.readlines()
@@ -153,7 +239,7 @@ def main():
     for k in range(len(np.diag(cov_matrix))):
         for j in range(len(np.diag(cov_matrix))):
             cov_matrix[j][k] *= factors[k] * factors[j]
-            # cov_matrix[j][k] *= 1.0
+            #cov_matrix[j][k] *= 1.0
 
     if print_cov_matrix is True:
         print(LogMessage(), "Evaluate covariance")
@@ -161,12 +247,12 @@ def main():
             for i in range(len(np.diag(cov_matrix))):
                 for j in range(len(np.diag(cov_matrix))):
                     print(i, j, cov_matrix[i, j], file=output)
-
+    '''
     print(
         LogMessage(),
         "Cond[Cov rho] = {:3.3e}".format(float(np.linalg.cond(cov_matrix))),
     )
-
+    '''
     corrmat = np.zeros((ne, ne))
     sigmavec = cov_matrix.diagonal()
 
@@ -209,87 +295,90 @@ def main():
         elinewidth=1.2,
     )
 
-    # Define the Gaussian function
-    def gaussian(x, amplitude, mean):
-        return amplitude * np.exp(-((x - mean) ** 2) / (2 * sigma**2))
+    x_range = np.linspace(min(x), max(x), 1000)
+    # Rough Initial guesses for parameters
+    if fit_peaks_switch == 0:
+        if four_fit:
+            if cauchy_fit is True:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.8, 3e-7, 2.1]
+                params, _ = curve_fit(four_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit, amp4_fit, mean4_fit = params
+            else:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.8, 3e-7, 2.1]
+                params, _ = curve_fit(four_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit, amp4_fit, mean4_fit = params
+        elif (triple_fit == True and four_fit == False):
+            if cauchy_fit is True:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.9]
+                params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
+            else:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 2.1]
+                params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
+        elif (triple_fit == False and four_fit == False):
+            if cauchy_fit is True:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5]
+                params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
+            else:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5]
+                params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
+    elif fit_peaks_switch == 1:
+        if triple_fit == True:
+            if cauchy_fit is True:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.9]
+                params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
+            else:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 2.1]
+                params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
+        elif (triple_fit == False and four_fit == False):
+            if cauchy_fit is True:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5]
+                params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
+            else:
+                initial_guess = [4e-7, 1.0, 6e-7, 1.5]
+                params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
 
-    # Define the sum of two Gaussian functions
-    def double_gaussian(params, x):
-        amplitude_1 = params["amplitude_1"].value
-        mean_1 = params["mean_1"].value
-        amplitude_2 = params["amplitude_2"].value
-        mean_2 = params["mean_2"].value
 
-        model = gaussian(x, amplitude_1, mean_1) + gaussian(x, amplitude_2, mean_2)
-        return model
+    #print(params)
+    plt.draw()
 
-    def double_gaussian2(amplitude1, mean1, amplitude2, mean2, x):
-        model = gaussian(x, amplitude1, mean1) + gaussian(x, amplitude2, mean2)
-        return model
+    ##################### Fitting initial parameter guesses #############################
+    if fit_peaks_switch == 0:
+        params = Parameters()
+        params.add("amplitude_1", value=amp1_fit, min=amp1_fit - 0.4*amp1_fit, max=amp1_fit+ 0.4*amp1_fit)
+        params.add("mean_1", value=1.0, min=0.96, max=1.04)
+        params.add("amplitude_2", value=amp2_fit, min=amp2_fit - 0.4*amp2_fit, max=amp2_fit+ 0.4*amp2_fit)
+        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.25, max=mean2_fit + 0.25)
+        if triple_fit is True:
+            params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
+            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.5, max=mean3_fit + 0.5)
+        if four_fit is True:
+            params.add("amplitude_4", value=amp4_fit, min=amp4_fit - 0.4*amp4_fit, max=amp4_fit+ 0.4*amp4_fit)
+            params.add("mean_4", value=mean4_fit, min=mean4_fit - 0.5, max=mean4_fit + 0.5)
+    elif fit_peaks_switch == 1:
+        params = Parameters()
+        params.add("amplitude_1", value=amp1_fit, min=amp1_fit - 0.4*amp1_fit, max=amp1_fit+ 0.4*amp1_fit)
+        params.add("mean_1", value=1.0, min=0.96, max=1.04)
+        params.add("amplitude_2", value=amp2_fit, min=amp2_fit - 0.4*amp2_fit, max=amp2_fit+ 0.4*amp2_fit)
+        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.25, max=mean2_fit + 0.25)
+        if triple_fit is True:
+            params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
+            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.5, max=mean3_fit + 0.5)
+            params.add("amplitude_4", value=1e-14, min=0.0, max=1e-10)
+            params.add("mean_4", value=4.5, min=4.0, max=5.0)
+            four_fit = True
+        params.add("amplitude_3", value=1e-14, min=0.0, max=1e-10)
+        params.add("mean_3", value=3.5, min=3.0, max=4.0)
+        triple_fit = True
 
-    def triple_gaussian2(amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, x):
-        model = (
-            gaussian(x, amplitude1, mean1)
-            + gaussian(x, amplitude2, mean2)
-            + gaussian(x, amplitude3, mean3)
-        )
-        return model
-
-    def four_gaussian2(
-        amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, amplitude4, mean4, x
-    ):
-        model = (
-            gaussian(x, amplitude1, mean1)
-            + gaussian(x, amplitude2, mean2)
-            + gaussian(
-                x,
-                amplitude3,
-                mean3,
-            )
-            + gaussian(x, amplitude4, mean4)
-        )
-        return model
-
-    #######################################################################
-    # Cauchy functions
-    def cauchy(x, amplitude, mean):
-        return amplitude * (sigma / ((x - mean) ** 2 + sigma**2))
-
-    def double_cauchy(params, x):
-        amplitude_1 = params["amplitude_1"].value
-        mean_1 = params["mean_1"].value
-        amplitude_2 = params["amplitude_2"].value
-        mean_2 = params["mean_2"].value
-
-        model = cauchy(x, amplitude_1, mean_1) + cauchy(x, amplitude_2, mean_2)
-        return model
-
-    def double_cauchy2(amplitude1, mean1, amplitude2, mean2, x):
-        model = cauchy(x, amplitude1, mean1) + cauchy(x, amplitude2, mean2)
-        return model
-
-    def triple_cauchy2(amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, x):
-        model = (
-            cauchy(x, amplitude1, mean1)
-            + cauchy(x, amplitude2, mean2)
-            + cauchy(x, amplitude3, mean3)
-        )
-        return model
-
-    def four_cauchy2(
-        amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, amplitude4, mean4, x
-    ):
-        model = (
-            cauchy(x, amplitude1, mean1)
-            + cauchy(x, amplitude2, mean2)
-            + cauchy(
-                x,
-                amplitude3,
-                mean3,
-            )
-            + cauchy(x, amplitude4, mean4)
-        )
-        return model
+    #####################################################################################
 
     #######################################################################
     def chisq_correlated(params, x, data, cov):
@@ -308,19 +397,19 @@ def main():
 
         cov_inv = np.linalg.inv(cov)
 
-        model = double_gaussian2(ampl_1, e0, ampl_2, e1, x)
+        model = double_gaussian2(x,ampl_1, e0, ampl_2, e1)
 
         if cauchy_fit is True:
-            model = double_cauchy2(ampl_1, e0, ampl_2, e1, x)
+            model = double_cauchy2(x,ampl_1, e0, ampl_2, e1)
 
         if triple_fit is True:
-            model = triple_gaussian2(ampl_1, e0, ampl_2, e1, ampl_3, e2, x)
+            model = triple_gaussian2(x,ampl_1, e0, ampl_2, e1, ampl_3, e2)
             if cauchy_fit is True:
-                model = triple_cauchy2(ampl_1, e0, ampl_2, e1, ampl_3, e2, x)
+                model = triple_cauchy2(x,ampl_1, e0, ampl_2, e1, ampl_3, e2)
         if four_fit is True:
-            model = four_gaussian2(ampl_1, e0, ampl_2, e1, ampl_3, e2, ampl_4, e3, x)
+            model = four_gaussian2(x,ampl_1, e0, ampl_2, e1, ampl_3, e2, ampl_4, e3)
             if cauchy_fit is True:
-                model = four_cauchy2(ampl_1, e0, ampl_2, e1, ampl_3, e2, ampl_4, e3, x)
+                model = four_cauchy2(x,ampl_1, e0, ampl_2, e1, ampl_3, e2, ampl_4, e3)
 
         diff = abs(data - model)
         residual = cov_inv.dot(diff)
@@ -328,9 +417,9 @@ def main():
 
     def correlated_residual(amplitude1, mean1, amplitude2, mean2, x, data, cov):
         cov_inv = np.linalg.inv(cov)
-        model = double_gaussian2(amplitude1, mean1, amplitude2, mean2, x)
+        model = double_gaussian2(x,amplitude1, mean1, amplitude2, mean2)
         if cauchy_fit is True:
-            model = double_cauchy2(amplitude1, mean1, amplitude2, mean2, x)
+            model = double_cauchy2(x,amplitude1, mean1, amplitude2, mean2)
 
         diff = data - model
         residual = diff * cov_inv * diff.T
@@ -341,10 +430,10 @@ def main():
     ):
         cov_inv = np.linalg.inv(cov)
         model = triple_gaussian2(
-            amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, x
+            x,amplitude1, mean1, amplitude2, mean2, amplitude3, mean3
         )
         if cauchy_fit is True:
-            model = triple_cauchy2(amplitude1, mean1, amplitude2, mean2, x)
+            model = triple_cauchy2(x,amplitude1, mean1, amplitude2, mean2)
         diff = model - data
         residual = diff * cov_inv * diff.T
 
@@ -365,6 +454,7 @@ def main():
     ):
         cov_inv = np.linalg.inv(cov)
         model = four_gaussian2(
+            x,
             amplitude1,
             mean1,
             amplitude2,
@@ -372,11 +462,10 @@ def main():
             amplitude3,
             mean3,
             amplitude4,
-            mean4,
-            x,
+            mean4
         )
         if cauchy_fit is True:
-            model = four_cauchy2(amplitude1, mean1, amplitude2, mean2, x)
+            model = four_cauchy2(x,amplitude1, mean1, amplitude2, mean2)
         diff = abs(model - data)
         residual = diff * cov_inv * diff.T
         return residual
@@ -394,9 +483,9 @@ def main():
         # Generate the fitted curve
         x_fit = np.linspace(plot_min_lim, plot_max_lim, 1000)
 
-        double_gaussian(result.params, x_fit)
+        double_gaussian(x_fit, result.params)
         if cauchy_fit is True:
-            double_cauchy(result.params, x_fit)
+            double_cauchy(x_fit, result.params)
 
         # Plot the fitted curve
         #        plt.plot(x_fit, y_fit, label='Fitted Curve', linewidth=1.3, color='red', alpha=0.2)
@@ -415,7 +504,13 @@ def main():
             mean_vals4.append(float(result.params["mean_4"]))
 
         print(LogMessage(), "#############################")
-        print(LogMessage(), "Fit number ", k, " done.")
+        if fit_peaks_switch == 0:
+            print(LogMessage(), f"Ens: {ensemble}, Repr: {rep}, Channel: {channel}, Kernel: {kernel}, No. Peaks: {old_k_peaks}, Bootstrap Fit number:", k, f"/ {nboot} done.")
+        elif fit_peaks_switch == 1:
+            print(LogMessage(),
+                  f"Ens: {ensemble}, Channel: {channel}, Kernel: {kernel}, No. Peaks: {new_k_peaks}, Bootstrap Fit number:",
+                  k, f"/{nboot} done.")
+        '''
         print(LogMessage(), "Amplitude_1: ", float(result.params["amplitude_1"]))
         print(LogMessage(), "Mean_1: ", float(result.params["mean_1"]))
         print(LogMessage(), "Amplitude_2: ", float(result.params["amplitude_2"]))
@@ -428,26 +523,27 @@ def main():
         if four_fit is True:
             print(LogMessage(), "Amplitude_4: ", float(result.params["amplitude_4"]))
             print(LogMessage(), "Mean_4: ", float(result.params["mean_4"]))
-        print(LogMessage(), "#############################")
+        '''
+        #print(LogMessage(), "#############################")
     ################## End of cycle #######################################à
     amplitude1 = np.average(amplitude_vals1)
-    damplitude1 = np.std(amplitude_vals1)
+    damplitude1 = 0.25*np.std(amplitude_vals1)
     amplitude2 = np.average(amplitude_vals2)
-    damplitude2 = np.std(amplitude_vals2)
+    damplitude2 = 0.25*np.std(amplitude_vals2)
     mean1 = np.average(mean_vals1)
-    dmean1 = np.std(mean_vals1)
+    dmean1 = 0.25*np.std(mean_vals1)
     mean2 = np.average(mean_vals2)
-    dmean2 = np.std(mean_vals2)
+    dmean2 = 0.25*np.std(mean_vals2)
     if triple_fit is True:
         amplitude3 = np.average(amplitude_vals3)
-        damplitude3 = np.std(amplitude_vals3)
+        damplitude3 = 0.25*np.std(amplitude_vals3)
         mean3 = np.average(mean_vals3)
-        dmean3 = np.std(mean_vals3)
+        dmean3 = 0.25*np.std(mean_vals3)
     if four_fit is True:
         amplitude4 = np.average(amplitude_vals4)
-        damplitude4 = np.std(amplitude_vals4)
+        damplitude4 = 0.25*np.std(amplitude_vals4)
         mean4 = np.average(mean_vals4)
-        dmean4 = np.std(mean_vals4)
+        dmean4 = 0.25*np.std(mean_vals4)
 
     y_gaussian_1 = [[0] * len(x_fit) for _ in range(nboot)]
     y_gaussian_2 = [[0] * len(x_fit) for _ in range(nboot)]
@@ -500,6 +596,7 @@ def main():
                 plt.plot(
                     x1,
                     four_gaussian2(
+                        x1,
                         amplitude1,
                         mean1,
                         amplitude2,
@@ -507,8 +604,7 @@ def main():
                         amplitude3,
                         mean3,
                         amplitude4,
-                        mean4,
-                        x1,
+                        mean4
                     ),
                     color="gray",
                 )
@@ -516,6 +612,7 @@ def main():
                 plt.plot(
                     x1,
                     four_cauchy2(
+                        x1,
                         amplitude1,
                         mean1,
                         amplitude2,
@@ -524,7 +621,6 @@ def main():
                         mean3,
                         amplitude4,
                         mean4,
-                        x1,
                     ),
                     color="gray",
                 )
@@ -533,7 +629,7 @@ def main():
                 plt.plot(
                     x1,
                     triple_gaussian2(
-                        amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, x1
+                        x1, amplitude1, mean1, amplitude2, mean2, amplitude3, mean3
                     ),
                     color="gray",
                 )
@@ -541,7 +637,7 @@ def main():
                 plt.plot(
                     x1,
                     triple_cauchy2(
-                        amplitude1, mean1, amplitude2, mean2, amplitude3, mean3, x1
+                        x1, amplitude1, mean1, amplitude2, mean2, amplitude3, mean3
                     ),
                     color="gray",
                 )
@@ -549,19 +645,21 @@ def main():
         if cauchy_fit is False:
             plt.plot(
                 x1,
-                double_gaussian2(amplitude1, mean1, amplitude2, mean2, x1),
+                double_gaussian2(x1, amplitude1, mean1, amplitude2, mean2),
                 color="orange",
             )
         else:
             plt.plot(
                 x1,
-                double_cauchy2(amplitude1, mean1, amplitude2, mean2, x1),
+                double_cauchy2(x1, amplitude1, mean1, amplitude2, mean2),
                 color="orange",
             )
 
     plt.grid(linestyle="dashed", alpha=0.6)
     # plt.legend()
+
     ############################# Print results ###################################################
+    '''
     print("############################ Fit results ############################")
     print(
         LogMessage(),
@@ -679,50 +777,37 @@ def main():
             "+-",
             dmean4,
         )
+    '''
+    # Print results to a csv
+    # Print column headers
+    headers = ["ensemble", "kernel", "rep", "channel", "peaks", "#aE_0", "errorE0", "#aE_1", "errorE1"]
+    headers.extend(["#aE_2", "errorE2"])
+    headers.extend(["#aE_3", "errorE3"])
 
-    # Print results to a file
-    with open("Spectrum.txt", "w") as file:
-        # Print column headers
-        headers = ["#aE_0", "errorE0", "#aE_1", "errorE1"]
+    #print(*headers, sep=" ", file=file)
 
-        if triple_fit:
-            headers.extend(["#aE_2", "errorE2"])
-        if four_fit:
-            headers.extend(["#aE_3", "errorE3"])
+    # Print values in columns
+    values = [mean1 * mpi, dmean1 * mpi, mean2 * mpi, dmean2 * mpi]
 
-        headers.extend(
-            ["Amplitude1", "errorAmplitude1", "Amplitude2", "errorAmplitude2"]
-        )
+    if triple_fit:
+        values.extend([mean3 * mpi, dmean3 * mpi])
+    if four_fit:
+        values.extend([mean4 * mpi, dmean4 * mpi])
 
-        if triple_fit:
-            headers.extend(["Amplitude3", "errorAmplitude3"])
-        if four_fit:
-            headers.extend(["Amplitude4", "errorAmplitude4"])
+    values = [
+        str(value)
+        for value in values
+        if not isinstance(value, bool) and not isinstance(value, str)
+    ]
 
-        print(*headers, sep=" ", file=file)
-
-        # Print values in columns
-        values = [mean1 * mpi, dmean1 * mpi, mean2 * mpi, dmean2 * mpi]
-
-        if triple_fit:
-            values.extend([mean3 * mpi, dmean3 * mpi])
-        if four_fit:
-            values.extend([mean4 * mpi, dmean4 * mpi])
-
-        values.extend([amplitude1, damplitude1, amplitude2, damplitude2])
-
-        if triple_fit:
-            values.extend([amplitude3, damplitude3])
-        if four_fit:
-            values.extend([amplitude4, damplitude4])
-
-        values = [
-            str(value)
-            for value in values
-            if not isinstance(value, bool) and not isinstance(value, str)
-        ]
-        print(*values, sep=" ", file=file)
-
+    # Assuming 'file' is your file object opened in write mode
+    with open(f'../tables/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        formatted_values = [f'{float(val):.4f}' for val in values]
+        if fit_peaks_switch == 0:
+            csvwriter.writerow([ensemble, kernel, rep, channel, k_peaks] + formatted_values)
+        elif fit_peaks_switch == 1:
+            csvwriter.writerow([ensemble, kernel, rep, channel, k_peaks + 1] + formatted_values[:-2])
     result1 = gaussian(x1, amplitude1, mean1)
     transpose_y_gaussian1 = [
         [y_gaussian_1[j][i] for j in range(nboot)] for i in range(len(x1))
@@ -992,7 +1077,7 @@ def main():
         if cauchy_fit is False:
             plt.plot(
                 x1,
-                double_gaussian2(amplitude1, mean1, amplitude2, mean2, x1),
+                double_gaussian2(x1, amplitude1, mean1, amplitude2, mean2),
                 color="orange",
                 linewidth=1.8,
             )
@@ -1002,7 +1087,7 @@ def main():
         else:
             plt.plot(
                 x1,
-                double_cauchy2(amplitude1, mean1, amplitude2, mean2, x1),
+                double_cauchy2(x1, amplitude1, mean1, amplitude2, mean2),
                 color="orange",
                 linewidth=1.8,
             )
@@ -1075,11 +1160,92 @@ def main():
                 flag_chi2 = False
         print(LogMessage(), " Reduced Chi Square (with correlation): ", chi_square_red)
 
+    # Plot the data
+    plt.errorbar(
+        x,
+        rho_central,
+        yerr=drho_central,
+        fmt="o",
+        color="black",
+        markersize=3.0,
+        label="Spectral density",
+        elinewidth=1.2,
+    )
+    '''
     # Save the figure with the specified size
     plt.savefig(output_name, format="pdf", dpi=300)
+    '''
     # Display the plot
     #plt.show()
+    return None
+########################### Preferences ################################
+# If you want to fit with Cauchy (False == Gaussians)
+cauchy_fit = True
+# If both false, it's two Gaussians/Cauchy fit
+triple_fit = False
+four_fit = False
+print_cov_matrix = False
+plot_cov_mat = False
+plot_corr_mat = False
+flag_chi2 = False  # To compute and show the correlated chi-square
+if four_fit is True:
+    triple_fit = True
+
+matrix_4D, k_peaks, Nboot_fit  = read_csv()
+ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
+#ensembles = ['M3']
+mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
+#mesonic_channels = ['gi']
+reps = ['fund', 'as']
+#reps = ['fund']
+kerneltype = ['GAUSS', 'CAUCHY']
+#kerneltype = ['GAUSS']
+#ensemble_num = 2
+#channel_num = 1
+
+headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]
+headers.extend(["aE_2", "errorE2"])
+headers.extend(["aE_3", "errorE3"])
 
 
-if __name__ == "__main__":
-    main()
+# TODO: match names with spec_dens code outputs in our inputs
+
+for index, ensemble in enumerate(ensembles):
+    with open(f'../tables/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(headers)
+    ensemble_num = index
+    for rep in reps:
+        for k, channel in enumerate(mesonic_channels):
+            for kernel in kerneltype:
+                for fit_peaks_switch in range(2):
+                    new_k_peaks = k_peaks[ensemble][k] + 1
+                    old_k_peaks = k_peaks[ensemble][k]
+                    channel_num = k
+                    if rep == 'as':
+                        channel_num += 6
+
+                    if kernel == 'GAUSS':
+                        cauchy_fit = False
+                    elif kernel == 'CAUCHY':
+                        cauchy_fit = True
+                    if k_peaks[ensemble][channel_num] == 2:  # kpeaks[ensemble][channel]
+                        triple_fit = False
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 3:
+                        triple_fit = True
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 4:
+                        triple_fit = True
+                        four_fit = True
+
+                    path = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/{channel}_{rep}/Logs/"
+                    file_path_input = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/fit_results.txt"
+
+                    if fit_peaks_switch == 0:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{old_k_peaks}.pdf"
+                    elif fit_peaks_switch == 1:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
+
+                    perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch)

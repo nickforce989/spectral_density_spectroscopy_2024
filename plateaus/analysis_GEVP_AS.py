@@ -147,7 +147,7 @@ for ch in CHs_tag:
             )
         )
 
-with open("CSVs/AS_meson_GEVP.csv", "w", newline="") as csvfile:
+with open("../tables/AS_meson_GEVP.csv", "w", newline="") as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(fieldnames)
     writer.writerows(CSV_data_F)

@@ -3,7 +3,7 @@ import random
 
 ### hard coded bootstrap parameters
 
-bin_size = 1
+bin_size = 2
 num_sample = 1000
 num_confs = 0
 seed = 8437

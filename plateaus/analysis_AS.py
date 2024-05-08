@@ -120,7 +120,7 @@ with open("metadata/mesonAS_meta.csv", newline="") as csvfile:
 
         n += 1
 
-with open("CSVs/AS_meson.csv", "w", newline="") as csvfile:
+with open("../tables/AS_meson.csv", "w", newline="") as csvfile:
     fieldnames = [
         "ENS",
         "Nt",
