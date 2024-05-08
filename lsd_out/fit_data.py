@@ -509,7 +509,7 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         elif fit_peaks_switch == 1:
             print(LogMessage(),
                   f"Ens: {ensemble}, Channel: {channel}, Kernel: {kernel}, No. Peaks: {new_k_peaks}, Bootstrap Fit number:",
-                  k, f"/{nboot} done.")
+                  k, f"/ {nboot} done.")
         '''
         print(LogMessage(), "Amplitude_1: ", float(result.params["amplitude_1"]))
         print(LogMessage(), "Mean_1: ", float(result.params["mean_1"]))
@@ -1209,6 +1209,7 @@ headers.extend(["aE_3", "errorE3"])
 
 
 # TODO: match names with spec_dens code outputs in our inputs
+# TODO: sp_dens_code.py --> structure of 'input_fit/'
 
 for index, ensemble in enumerate(ensembles):
     with open(f'../tables/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
