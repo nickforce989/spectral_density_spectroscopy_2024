@@ -24,8 +24,8 @@ Maurizio Piai, Davide Vadacchino.
       conda env create -f environment.yml
       ```
   
-      with the caveat that if you're using an Apple silicon CPU then you need to use Conda 24.3 or later, and specify ```--platform osx-64```
-      in your ```conda env create``` call.
+  with the caveat that if you're using an Apple silicon CPU then you need to use Conda 24.3 or later, and specify ```--platform osx-64```
+  in your ```conda env create``` call.
 
 
 * Once the environment is created, you can active the it:
