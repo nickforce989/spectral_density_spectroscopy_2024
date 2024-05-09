@@ -6,7 +6,9 @@ reproduce the results in **(arXiv:2405.01388)**.
 
 ## Authors
 
-Niccolò Forzano, Ho Hsiao, Fabian Zierler
+Niccolò Forzano, Ho Hsiao, Fabian Zierler, Ed Bennett, Luigi Del Debbio, Ryan C. Hill,
+Deog Ki Hong, Jong-Wan Lee, C.-J. David Lin, Biagio Lucini, Alessandro Lupo,
+Maurizio Piai, Davide Vadacchino.
 
 
 ## Set up environment
@@ -31,20 +33,29 @@ conda activate analysis-env
 
 ## Code usage
 
-To reproduce all the plots that are shown in the papers, run 
-``bash run_plots.sh``. To do so, ensure that the CSVs in ``plateaus/CSVs`` are full. Please, also ensure that ``input_topology/`` is full.
+* To reproduce all the plots that are shown in the paper, run 
+  ``bash run_plots.sh``. To do so, ensure that the CSVs in ``plateaus/CSVs`` are full. 
+  Please, make sure that also ``input_topology/`` is full. The results will be found in
+  ``plots/``.
 
-To find all the spectral densities from scratch and exactly how they have been used in the paper,
-ensure that the HDF5 file containing all the data is present in the 
-directory ``input_correlators/``, and then run ``bash run_spectral_densities.sh``.
+* To reproduce all the plots and results in the tables present in the paper, please run
+  ``reproduce_everything.sh``. Please, make sure that ``input_fit/``, ``input_topology/`` and
+  ``input_correlators/`` are full, before running. The results will be found in ``plots/`` and
+  ``tables/``.
 
-Spectral density fits can be reproduced by using ``lsd_out/fit_data.py``.
+* To find all the spectral densities from scratch, and fit them run ``run_spectral_densities.sh``. 
+  While running this file:
+   * If ``input_fit/`` has been filled (using the corresponding directory in doi:10.5281/zenodo.11048346)
+     the fitting procedure will be applied to pre-reconstructed spectral densities.
+   * If ``input_fit/`` is empty, the code will reconstruct from scratch the spectral densities and then
+     to fit them. This procedure may take quite long time.
 
-To find all the GEVP plateaus results from scratch, selecting the plateaus
-extents by hand, run ``bash self_finding_plateaus.sh``. Firstly, ensure that the HDF5
-file containing all the data is present in the  directory ``input_correlators/``.
-The command ``bash run_plateaus.sh``, instead, reproduces the plateaus by using the 
-metadata used for the analysis in the paper. 
+  Please, make sure that the HDF5 file containing all the data is present in the 
+  directory ``input_correlators/`` before running ``bash run_spectral_densities.sh``.
+
+* The command ``bash run_plateaus.sh`` reproduces the GEVP plateaus by using the 
+  metadata used for the analysis in the paper. Firstly, make sure that the HDF5
+  file containing all the data is present in the  directory ``input_correlators/``.
 
 ## Acknoledgement
 
