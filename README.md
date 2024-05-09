@@ -30,9 +30,9 @@ Maurizio Piai, Davide Vadacchino.
 
 * Once the environment is created, you can active the it:
 
-```
-conda activate analysis-env
-```
+
+      conda activate analysis-env
+
 
 ## Code usage
 
