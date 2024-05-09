@@ -10,8 +10,8 @@ gr(tickfontsize=10,labelfontsize=12,titlefontsize=14)
 println("Topological charge autocorrelation...")
 
 # output from DiaL
-files = readdir("../output/flow_analysis",join=true) 
-param = readdlm("../output/tables/table1_machine_readable.csv",',',skipstart=1)
+files = readdir("../../../../tables/output_topology/flow_analysis",join=true) 
+param = readdlm("../../../../tables/output_topology/table1_machine_readable.csv",',',skipstart=1)
 
 T = Int.(param[:,2])
 L = Int.(param[:,3])
