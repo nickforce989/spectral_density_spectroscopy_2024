@@ -37,9 +37,7 @@ Maurizio Piai, Davide Vadacchino.
 ## Code usage
 
 * To reproduce all the plots that are shown in the paper, run 
-  ``bash run_plots.sh``. To do so, ensure that the CSVs in ``plateaus/CSVs`` are full. 
-  Please, make sure that also ``input_topology/`` is full. The results will be found in
-  ``plots/``.
+  ``bash run_plots.sh``. Please, make sure that ``input_topology/`` is full. The results will be found in ``plots/``.
 
 * To find all the spectral densities from scratch, and fit them run ``run_spectral_densities.sh``. 
   While running this file:
