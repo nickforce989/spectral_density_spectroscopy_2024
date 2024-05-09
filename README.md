@@ -13,7 +13,7 @@ Maurizio Piai, Davide Vadacchino.
 
 ## Set up environment
 
-* Download this code and download the data release files in doi:10.5281/zenodo.11048346.
+* Download this code and download the data release files in **doi:10.5281/zenodo.11048346**.
   From there, put ``chimera_data_full.hdf5`` in ``input_correlators/`` and the content of 
   ``input_topology.zip`` in ``input_topology/``.
 
@@ -41,7 +41,7 @@ Maurizio Piai, Davide Vadacchino.
 
 * To find all the spectral densities from scratch, and fit them run ``run_spectral_densities.sh``. 
   While running this file:
-   * If ``input_fit/`` has been filled (using the corresponding directory in doi:10.5281/zenodo.11048346)
+   * If ``input_fit/`` has been filled (using the corresponding directory in **doi:10.5281/zenodo.11048346**)
      the fitting procedure will be applied to pre-reconstructed spectral densities.
    * If ``input_fit/`` is empty, the code will reconstruct from scratch the spectral densities and then
      to fit them. This procedure may take quite long time.
