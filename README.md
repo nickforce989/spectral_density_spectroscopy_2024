@@ -38,11 +38,6 @@ conda activate analysis-env
   Please, make sure that also ``input_topology/`` is full. The results will be found in
   ``plots/``.
 
-* To reproduce all the plots and results in the tables present in the paper, please run
-  ``reproduce_everything.sh``. Please, make sure that ``input_fit/``, ``input_topology/`` and
-  ``input_correlators/`` are full, before running. The results will be found in ``plots/`` and
-  ``tables/``.
-
 * To find all the spectral densities from scratch, and fit them run ``run_spectral_densities.sh``. 
   While running this file:
    * If ``input_fit/`` has been filled (using the corresponding directory in doi:10.5281/zenodo.11048346)
@@ -56,6 +51,11 @@ conda activate analysis-env
 * The command ``bash run_plateaus.sh`` reproduces the GEVP plateaus by using the 
   metadata used for the analysis in the paper. Firstly, make sure that the HDF5
   file containing all the data is present in the  directory ``input_correlators/``.
+
+* To reproduce all the plots and results in the tables present in the paper, please run
+  ``reproduce_everything.sh``. Please, make sure that ``input_fit/``, ``input_topology/`` and
+  ``input_correlators/`` are full, before running. The results will be found in ``plots/`` and
+  ``tables/``.
 
 ## Acknoledgement
 
