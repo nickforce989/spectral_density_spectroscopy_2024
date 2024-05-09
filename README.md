@@ -13,19 +13,22 @@ Maurizio Piai, Davide Vadacchino.
 
 ## Set up environment
 
-Download this code and download the data release files in doi:10.5281/zenodo.11048346.
-From there, put ``chimera_data_full.hdf5`` in ``input_correlators/`` and the content of 
-``input_topology.zip`` in ``input_topology/``.
+* Download this code and download the data release files in doi:10.5281/zenodo.11048346.
+  From there, put ``chimera_data_full.hdf5`` in ``input_correlators/`` and the content of 
+  ``input_topology.zip`` in ``input_topology/``.
 
-Then, create the conda environment in terminal with conda installed:
+
+* Then, create the conda environment in terminal with conda installed:
 
 ```
 conda env create -f environment.yml
 ```
-with the caveat that if you're using an Apple silicon CPU then you need to use Conda 24.3 or later, and specify ```--platform osx-64```
-in your ```conda env create``` call.
+  
+  with the caveat that if you're using an Apple silicon CPU then you need to use Conda 24.3 or later, and specify ```--platform osx-64```
+  in your ```conda env create``` call.
 
-Once the environment is created, you can active it:
+
+* Once the environment is created, you can active the it:
 
 ```
 conda activate analysis-env
