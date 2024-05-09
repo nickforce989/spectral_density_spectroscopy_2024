@@ -22,6 +22,7 @@ cd ../two_kernels
 python different_kernels.py
 cd ../final_spectrum
 python spectrum_MN.py
+python spectrum_PS.py
 cd ../Fig7
 python3 fit_figure_gauss.py
 python3 fit_figure_cauchy.py
