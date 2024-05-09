@@ -14,8 +14,9 @@ Maurizio Piai, Davide Vadacchino.
 ## Set up environment
 
 * Download this code and download the data release files in **doi:10.5281/zenodo.11048346**.
-  From there, put ``chimera_data_full.hdf5`` in ``input_correlators/`` and the content of 
-  ``input_topology.zip`` in ``input_topology/``.
+  From there, put ``chimera_data_full.hdf5`` in ``input_correlators/``, the content of 
+  ``input_topology.zip`` in ``input_topology/`` and the content of ``input_fit/`` in 
+  ``input_fit/``.
 
 
 * Then, create the conda environment in terminal with conda installed:
