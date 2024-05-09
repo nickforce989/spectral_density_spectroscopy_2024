@@ -51,7 +51,7 @@ Maurizio Piai, Davide Vadacchino.
   
   Either way, to do so, run ``run_spectral_densities.sh``. 
 
-* Make sure that the HDF5 file containing all the data is present in the  directory ``input_correlators/``.The 
+* Make sure that the HDF5 file containing all the data is present in the  directory ``input_correlators/``. The 
   command ``bash run_plateaus.sh`` reproduces the GEVP plateaus by using the  metadata used for the analysis in the paper.
 
 * Make sure that ``input_fit/``, ``input_topology/`` and ``input_correlators/`` are full, before running.
