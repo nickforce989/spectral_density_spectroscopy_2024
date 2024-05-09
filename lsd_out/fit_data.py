@@ -509,7 +509,7 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         elif fit_peaks_switch == 1:
             print(LogMessage(),
                   f"Ens: {ensemble}, Channel: {channel}, Kernel: {kernel}, No. Peaks: {new_k_peaks}, Bootstrap Fit number:",
-                  k, f"/ {nboot} done.")
+                  k, f"/{nboot} done.")
         '''
         print(LogMessage(), "Amplitude_1: ", float(result.params["amplitude_1"]))
         print(LogMessage(), "Mean_1: ", float(result.params["mean_1"]))
