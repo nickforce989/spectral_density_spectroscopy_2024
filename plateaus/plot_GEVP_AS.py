@@ -39,7 +39,7 @@ CHs_tag = ["g5", "gi", "g0gi", "g5gi", "g0g5gi", "id"]
 CHs_name = ["ps", "v", "t", "av", "at", "s"]
 
 
-results = pd.read_csv("../tables/AS_meson_GEVP.csv")
+results = pd.read_csv("./CSVs/AS_meson_GEVP.csv")
 
 for ens in list(results.ENS.values):
     print(ens)
@@ -99,7 +99,7 @@ for ens in list(results.ENS.values):
         plt.close()
         # plt.show()
 
-results_mix = pd.read_csv("../tables/AS_meson_GEVP_mix.csv")
+results_mix = pd.read_csv("./CSVs/AS_meson_GEVP_mix.csv")
 
 CHs_mix = [
     ["g1", "g0g1"],

@@ -19,5 +19,5 @@ python analysis_GEVP_MIX_F.py
 #python record_GEVP_mixAS.py
 python analysis_GEVP_MIX_AS.py
 
-python plot_GEVP_F.py
-python plot_GEVP_AS.py
+#python plot_GEVP_F.py
+#python plot_GEVP_AS.py
