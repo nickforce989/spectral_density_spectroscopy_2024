@@ -44,10 +44,10 @@ Maurizio Piai, Davide Vadacchino.
   directory ``input_correlators/`` before running ``bash run_spectral_densities.sh``.
 
   The spectral densities can be found and fitted.
-       * If ``input_fit/`` has been filled (using the corresponding directory in https://doi.org/10.5281/zenodo.11048346)
-       the fitting procedure will be applied to pre-reconstructed spectral densities.
-       * If ``input_fit/`` is empty, the code will reconstruct from scratch the spectral densities and then
-       to fit them. This procedure may take quite long time.
+          * If ``input_fit/`` has been filled (using the corresponding directory in https://doi.org/10.5281/zenodo.11048346)
+          the fitting procedure will be applied to pre-reconstructed spectral densities.
+           * If ``input_fit/`` is empty, the code will reconstruct from scratch the spectral densities and then
+           to fit them. This procedure may take quite long time.
   
   Either way, to do so, run ``run_spectral_densities.sh``. 
 
