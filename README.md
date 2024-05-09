@@ -13,7 +13,7 @@ Maurizio Piai, Davide Vadacchino.
 
 ## Set up environment
 
-* Download this code and download the data release files in **doi:10.5281/zenodo.11048346**.
+* Download this code and download the data release files in https://doi.org/10.5281/zenodo.11048346.
   From there, put ``chimera_data_full.hdf5`` in ``input_correlators/``, the content of 
   ``input_topology.zip`` in ``input_topology/`` and the content of ``input_fit/`` in 
   ``input_fit/``.
@@ -37,27 +37,26 @@ Maurizio Piai, Davide Vadacchino.
 
 ## Code usage
 
-* To reproduce all the plots that are shown in the paper, run 
-  ``bash run_plots.sh``. Please, make sure that ``input_topology/`` is full. The results will be found in ``plots/``.
+* Make sure that ``input_topology/`` is full. To reproduce all the plots that are shown in the paper, run 
+  ``bash run_plots.sh``.  The results will be found in ``plots/``.
 
-* To find all the spectral densities from scratch, and fit them run ``run_spectral_densities.sh``. 
-  While running this file:
-   * If ``input_fit/`` has been filled (using the corresponding directory in **doi:10.5281/zenodo.11048346**)
-     the fitting procedure will be applied to pre-reconstructed spectral densities.
-   * If ``input_fit/`` is empty, the code will reconstruct from scratch the spectral densities and then
-     to fit them. This procedure may take quite long time.
-
-  Please, make sure that the HDF5 file containing all the data is present in the 
+* Make sure that the HDF5 file containing all the data is present in the 
   directory ``input_correlators/`` before running ``bash run_spectral_densities.sh``.
 
-* The command ``bash run_plateaus.sh`` reproduces the GEVP plateaus by using the 
-  metadata used for the analysis in the paper. Firstly, make sure that the HDF5
-  file containing all the data is present in the  directory ``input_correlators/``.
+  The spectral densities can be found and fitted.
+       * If ``input_fit/`` has been filled (using the corresponding directory in https://doi.org/10.5281/zenodo.11048346)
+       the fitting procedure will be applied to pre-reconstructed spectral densities.
+       * If ``input_fit/`` is empty, the code will reconstruct from scratch the spectral densities and then
+       to fit them. This procedure may take quite long time.
+  
+  Either way, to do so, run ``run_spectral_densities.sh``. 
 
-* To reproduce all the plots and results in the tables present in the paper, please run
-  ``reproduce_everything.sh``. Please, make sure that ``input_fit/``, ``input_topology/`` and
-  ``input_correlators/`` are full, before running. The results will be found in ``plots/`` and
-  ``tables/``.
+* Make sure that the HDF5 file containing all the data is present in the  directory ``input_correlators/``.The 
+  command ``bash run_plateaus.sh`` reproduces the GEVP plateaus by using the  metadata used for the analysis in the paper.
+
+* Make sure that ``input_fit/``, ``input_topology/`` and ``input_correlators/`` are full, before running.
+  To reproduce all the plots and results in the tables present in the paper, please run
+  ``reproduce_everything.sh``. The results will be found in ``plots/`` and ``tables/``.
 
 ## Acknoledgement
 
