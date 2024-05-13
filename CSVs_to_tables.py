@@ -167,7 +167,7 @@ for index, ensemble in enumerate(ensembles):
     latex_table += "\\end{table}\n"
 
     # Write LaTeX table to a file for each chunk
-    with open(f'{ensemble}_output_table_aE0.tex', 'w') as file:
+    with open(f'./tables/{ensemble}_output_table_aE0.tex', 'w') as file:
         file.write(latex_table)
     # Reset LaTeX table for next chunk
     latex_table = ""
