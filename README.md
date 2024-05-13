@@ -13,10 +13,13 @@ Maurizio Piai, Davide Vadacchino.
 
 ## Set up environment
 
-* Download this code and download the data release files in https://doi.org/10.5281/zenodo.11048346.
-  From there, put ``chimera_data_full.hdf5`` in ``input_correlators/``, the content of 
-  ``input_topology.zip`` in ``input_topology/`` and the content of ``input_fit/`` in 
-  ``input_fit/``.
+* Download this code
+* From the data release at https://doi.org/10.5281/zenodo.11048346
+  * Download ``chimera_data_full.hdf5``, and place it in ``input_correlators/``
+  * Download ``input_topology.zip``,
+    and extract its contents into    ``input_topology/``
+  * Download ``input_fit/``,
+    and extract its contentse into ``input_fit/``.
 
 
 * Then, create the conda environment in terminal with conda installed:
@@ -39,8 +42,9 @@ Maurizio Piai, Davide Vadacchino.
 
 * The whole analysis can be done automatically:
 
-   * Make sure that ``input_fit/``, ``input_topology/`` and ``input_correlators/`` are full, before running.
-     To reproduce all the plots and results in the tables present in the paper, please run
+   * Make sure that ``input_fit/``, ``input_topology/`` and ``input_correlators/`` contain the relevant files from the data release,
+   as discussed above.
+   * To reproduce all the plots and results in the tables present in the paper, please run
      ``reproduce_everything.sh``. The results will be found in ``plots/`` and ``tables/``.
 
 
