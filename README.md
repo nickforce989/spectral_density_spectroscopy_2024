@@ -2,7 +2,7 @@
 
 This is the analysis code built on top of **lsdensities** code (
 <a href="https://github.com/LupoA/lsdensities"> GitHub repository </a>) to
-reproduce the results in **(arXiv:2405.01388)**.
+reproduce the results in **([arXiv:2405.01388][paper])**.
 
 ## Authors
 
@@ -72,3 +72,6 @@ The flow_analysis code in ```topologies/flow_analysis``` has been based on the f
 ## License
 
 [GPL](https://choosealicense.com/licenses/gpl-3.0/)
+
+
+[paper]: https://arxiv.org/abs/2405.01388
