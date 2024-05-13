@@ -4,7 +4,7 @@ Pkg.instantiate()
 include("utils.jl")
 
 inputDIR  = abspath("../../../../input_topology/gradient_flow/")
-outputDIR = abspath("../../../../tables/output_topology/flow_analysis/")
+outputDIR = abspath("../../../../CSVs/output_topology/flow_analysis/")
 ispath(outputDIR) || mkpath(outputDIR)
 ensembles = readdir(inputDIR)
 

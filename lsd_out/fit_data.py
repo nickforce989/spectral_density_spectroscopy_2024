@@ -801,7 +801,7 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     ]
 
     # Assuming 'file' is your file object opened in write mode
-    with open(f'../tables/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         formatted_values = [f'{float(val):.4f}' for val in values]
         if fit_peaks_switch == 0:
@@ -1212,7 +1212,7 @@ headers.extend(["aE_3", "errorE3"])
 # TODO: sp_dens_code.py --> structure of 'input_fit/'
 
 for index, ensemble in enumerate(ensembles):
-    with open(f'../tables/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
     ensemble_num = index

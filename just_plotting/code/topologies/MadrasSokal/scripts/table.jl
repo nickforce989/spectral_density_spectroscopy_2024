@@ -3,12 +3,12 @@ using DelimitedFiles
 using MadrasSokal
 println("Write table 1...")
 
-files  = readdir("../../../../tables/output_topology/flow_analysis",join=true) 
+files  = readdir("../../../../CSVs/output_topology/flow_analysis",join=true) 
 
-ispath("../../../../tables/output_topology/") || mkpath("../../../../tables/output_topology/")
-io1 = open("../../../../tables/output_topology/table1_machine_readable.csv","w")
-io2 = open("../../../../tables/output_topology/table1_human_readable.csv","w")
-io3 = open("../../../../tables/output_topology/table1.tex","w")
+ispath("../../../../CSVs/output_topology/") || mkpath("../../../../CSVs/output_topology/")
+io1 = open("../../../../CSVs/output_topology/table1_machine_readable.csv","w")
+io2 = open("../../../../CSVs/output_topology/table1_human_readable.csv","w")
+io3 = open("../../../../CSVs/output_topology/table1.tex","w")
 
 write(io1,"beta,T,L,mf,mas,ω0,Δω0,p,Δp,Q,ΔQ,first,last,skip,Nconf\n")
 write(io2,"beta,mas,mf,Nt,Nl,first,skip,Nconf,p,ω0,τ(Q),Q\n")

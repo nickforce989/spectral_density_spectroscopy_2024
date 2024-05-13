@@ -10,7 +10,7 @@ gr(tickfontsize=10,labelfontsize=12,titlefontsize=14)
 println("Plaquette autocorrelation...")
 
 files  = readdir("../../../../input_topology/plaquettes",join=true) 
-param = readdlm("../../../../tables/output_topology/table1_machine_readable.csv",',',skipstart=1)
+param = readdlm("../../../../CSVs/output_topology/table1_machine_readable.csv",',',skipstart=1)
 
 therms = Int.(param[:,12])
 T = Int.(param[:,2])
