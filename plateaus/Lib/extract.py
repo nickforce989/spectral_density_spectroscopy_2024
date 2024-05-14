@@ -195,6 +195,57 @@ def Analysis_Mass_eff_simple(C_resample, ti, tf, dt, measurement):
 
     return Mass_channel_tmp
 
+def Analysis_Mass_eff_simple2(C_resample, ti, tf, dt, measurement, n, E_string):
+    num_sample = np.shape(C_resample)[0]
+    GLB_T = np.shape(C_resample)[1]
+
+    Mass_channel_tmp = np.zeros(shape=(num_sample, GLB_T))
+    T_dot = np.arange(ti, tf, 1, dtype=int)
+
+    mass_tmp = []
+    err_tmp = []
+
+    Mass_channel_tmp = -np.log(np.roll(C_resample, -1, axis=1) / C_resample)
+
+    for t in T_dot:
+        Mass_err = bootstrap.bootstrap_error(
+            Mass_channel_tmp[0:-1, t], Mass_channel_tmp[-1, t]
+        )
+        mass_tmp.append(Mass_channel_tmp[-1, t])
+        err_tmp.append(Mass_err)
+
+    mass_tmp = np.array(mass_tmp)
+    err_tmp = np.array(err_tmp)
+
+    sprnext = next(sperater)
+    mk = next(marker)
+
+    select = (abs(err_tmp / mass_tmp)) < 0.10
+
+    plt.errorbar(
+        T_dot[select] + sprnext,
+        mass_tmp[select],
+        1.5*err_tmp[select],
+        linestyle="",
+        marker=mk,
+        alpha=0.6,
+        label=f"$aE_{n}$ fit: "+E_string,
+    )
+
+    plt.errorbar(
+        T_dot[~select] + sprnext,
+        mass_tmp[~select],
+        1.5*err_tmp[~select],
+        linestyle="",
+        marker=mk,
+        color=plt.gca().lines[-1].get_color(),
+        alpha=0.1,
+    )
+    plt.xlabel('$t / a$', fontsize=15)
+    plt.ylabel('$am_{\\rm{eff}}$', fontsize=15)
+
+    return Mass_channel_tmp
+
 
 def Analysis_Mass_eff_cosh(C_resample, ti, tf, measurement):
     num_sample = np.shape(C_resample)[0]
@@ -248,6 +299,68 @@ def Analysis_Mass_eff_cosh(C_resample, ti, tf, measurement):
         color=plt.gca().lines[-1].get_color(),
         alpha=0.1,
     )
+    return Mass_channel_tmp
+
+
+def Analysis_Mass_eff_cosh2(C_resample, ti, tf, measurement, n, E_string):
+    num_sample = np.shape(C_resample)[0]
+    GLB_T = np.shape(C_resample)[1]
+
+    Mass_channel_tmp = np.zeros(shape=(num_sample, GLB_T))
+    T_dot = np.arange(ti, tf, 1, dtype=int)
+
+    mass_tmp = []
+    err_tmp = []
+    Mass_channel_tmp = np.arccosh(
+        (np.roll(C_resample, 1, axis=1) + np.roll(C_resample, -1, axis=1))
+        / C_resample
+        / 2
+    )
+    for t in T_dot:
+        Mass_err = bootstrap.bootstrap_error(
+            Mass_channel_tmp[0:-1, t], Mass_channel_tmp[-1, t]
+        )
+        mass_tmp.append(Mass_channel_tmp[-1, t])
+        err_tmp.append(Mass_err)
+
+    mass_tmp = np.array(mass_tmp)
+    err_tmp = np.array(err_tmp)
+
+    sprnext = next(sperater)
+    mk = next(marker)
+
+    select = abs(err_tmp / mass_tmp) < 0.08
+
+    plt.errorbar(
+        T_dot[select] + sprnext,
+        mass_tmp[select],
+        1.5*err_tmp[select],
+        linestyle="",
+        elinewidth=2.0,
+        capsize=2,
+        marker=mk,
+        alpha=0.6,
+        label=f"$aE_{n}$ fit: "+E_string,
+    )
+    
+    plt.errorbar(
+        T_dot[~select] + sprnext,
+        mass_tmp[~select],
+        1.5*err_tmp[~select],
+        linestyle="",
+        elinewidth=2.0,
+        capsize=2,
+        marker=mk,
+        color=plt.gca().lines[-1].get_color(),
+        alpha=0.1,
+    )
+    
+    
+    plt.gca().set_title(None)
+    plt.ylim(0.0, 2.0)
+    plt.xlabel('$t / a$', fontsize=15)
+    plt.ylabel('$am_{\\rm{eff}}$', fontsize=15)
+    plt.ylim(0.0, 2.0)
     return Mass_channel_tmp
 
 

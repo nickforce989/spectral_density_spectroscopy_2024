@@ -24,7 +24,7 @@ for i in eachindex(files)
     configurations, plaq = plaquettes_grid(file)
     
     obslabel = L"\langle P ~ \rangle"
-    title = latexstring(L"\beta = %$(β[i],) ~~ N_t \times N_s^3 = %$(T[i]) \times %$(L[i])^3")
+    title = latexstring(L"\beta = %$(β[i]) , ~~ N_t \times N_s^3 = %$(T[i]) \times %$(L[i])^3")
 
     dir1 = abspath("../../../../plots/plaquette_publication")
     dir2 = abspath("../../../../plots/plaquette")

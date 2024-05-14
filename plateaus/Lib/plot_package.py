@@ -23,9 +23,9 @@ rcParams.update(
     {
         "figure.figsize": (W, W * r),  # 4:3 aspect ratio
         "font.size": 16 * scale,  # Set font size to 11pt
-        "axes.labelsize": 16 * scale,  # -> axis labels
+        "axes.labelsize": 18 * scale,  # -> axis labels
         "legend.fontsize": 16 * scale,  # -> legends
-        "lines.markersize": 10 * scale,
+        "lines.markersize": 5 * scale,
         "font.family": "lmodern",
         "text.usetex": True,
         "text.latex.preamble": (  # LaTeX preamble
