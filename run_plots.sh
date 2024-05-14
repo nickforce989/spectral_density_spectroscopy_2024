@@ -24,6 +24,7 @@ cd ../final_spectrum
 python spectrum_MN.py
 python spectrum_PS.py
 cd ../Fig7
+python check_meson.py
 python3 fit_figure_gauss.py
 python3 fit_figure_cauchy.py
 cd ../Fig10
@@ -40,6 +41,5 @@ python3 fit_figure_gauss_up.py
 python3 fit_figure_gauss_middle.py
 python3 fit_figure_gauss_down.py
 cd ../../../plateaus
-python check_meson.py
 python plot_GEVP_F.py
 python plot_GEVP_AS.py
