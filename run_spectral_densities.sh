@@ -1,14 +1,23 @@
 #!/bin/bash
 
 directory="input_fit"
+subdirs=("M1" "M2" "M3" "M4" "M5")
+all_subdirs_present=true
 
-# Check if 'input_fit/' is empty
-if [ -z "$(ls -A $directory)" ]; then
-    cd lsd_out
+for subdir in "${subdirs[@]}"; do
+    if [ ! -d "$directory/$subdir" ]; then
+        all_subdirs_present=false
+        break
+    fi
+done
+
+cd lsd_out
+
+if [ "$all_subdirs_present" = false ]; then
     python analyse_data.py
     python print_samples.py
     python fit_data.py
 else
-    cd lsd_out
     python fit_data.py
 fi
+
