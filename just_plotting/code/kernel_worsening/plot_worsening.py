@@ -139,7 +139,7 @@ axs[1].grid(linestyle='--')
 axs[2].grid(linestyle='--')
 
 plt.savefig(
-    '../../../plots/kernel_comparison.png',
+    '../../../plots/kernel_worsening.pdf',
     dpi=130, bbox_inches='tight'
 )
 
