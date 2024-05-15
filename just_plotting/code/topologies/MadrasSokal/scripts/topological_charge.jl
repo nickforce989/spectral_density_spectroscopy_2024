@@ -11,7 +11,7 @@ println("Topological charge autocorrelation...")
 
 # output from DiaL
 files = readdir("../../../../CSVs/output_topology/flow_analysis",join=true) 
-param = readdlm("../../../../CSVs/output_topology/table1_machine_readable.csv",',',skipstart=1)
+param = readdlm("../../../../CSVs/output_topology/gradient_flow_observables.csv",',',skipstart=1)
 
 T = Int.(param[:,2])
 L = Int.(param[:,3])

@@ -76,14 +76,14 @@ tf = 23
 y_min = 0.405
 y_max = 0.45
 x_min = 9.7
-x_max = 22.5
+x_max = 23.5
 Nsource = 20
 Nsink = 20
 plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(3))
 plt.gca().yaxis.set_major_locator(ticker.MultipleLocator(0.01))
 a, b = calculate_mass_and_plot(ti, tf, x_min, x_max, y_min, y_max, Nsource, Nsink)
 
-plot_line(a, b, 20, 22.0, plt.gca().lines[-1].get_color())
+plot_line(a, b, 21, 23.0, plt.gca().lines[-1].get_color())
 
 #plt.show()
 plt.savefig(f'../../../plots/N{Nsource}_N{Nsink}_2.pdf', dpi=300, bbox_inches='tight')

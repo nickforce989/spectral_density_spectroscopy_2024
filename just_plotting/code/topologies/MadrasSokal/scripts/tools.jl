@@ -31,9 +31,9 @@ function _parameters_from_filename(file)
 end
 function _wilson_flow_scale_from_file(file)
     header    = readline(file)
-    ω0_string = replace(header,"=" => " ", "+/-" => " ", r"[(,)]"=>" ")
-    ω0, Δω0   = parse.(Float64,split(ω0_string)[end-1:end])
-    return ω0, Δω0
+    w0_string = replace(header,"=" => " ", "+/-" => " ", r"[(,)]"=>" ")
+    w0, dw0   = parse.(Float64,split(w0_string)[end-1:end])
+    return w0, dw0
 end
 function _binned_mean_std(O;bin=1)
     mO = mean(O)

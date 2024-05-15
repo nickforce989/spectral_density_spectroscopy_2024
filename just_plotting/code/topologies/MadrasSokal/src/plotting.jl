@@ -27,15 +27,15 @@ function publication_plot(obs,obslabel,therm;thermstep=1,minlags=100,kws...)
     # Determine a suitable n_therm by looking at τ as a function 
     # of the thermalisation cut, as well as a histogram of the plaquette
     therms = collect(1:thermstep:length(obs)÷2)
-    τ_therm, Δτ_therm = madras_sokal_time(obs,therms)
+    τ_therm, dτ_therm = madras_sokal_time(obs,therms)
     
     # If therm is too large use the maximal value of thermstep
     therm = min(maximum(therms),therm)
     o = obs[therm:end]
     
-    τ, Δτ = madras_sokal_windows(o)
+    τ, dτ = madras_sokal_windows(o)
     τmax, W = findmax(τ)
-    Δτmax = Δτ[W] 
+    dτmax = dτ[W] 
     τexp = exponential_autocorrelation_time(obs[therm:end];minlags)
     l1 = L"τ_{\rm int}=%$(round(τmax,digits=1))"
     l2 = L"(τ_{\rm exp}=%$(round(τexp,digits=1)))"
@@ -47,22 +47,22 @@ function publication_plot(obs,obslabel,therm;thermstep=1,minlags=100,kws...)
     #display(plt2)
     plot!(plt1,ylims=ylims(plt2))
     plt = plot(plt1,plt2,link=:y,layout=grid(1,2,widths = [0.7,0.3]);kws...)
-    return plt, τmax, Δτmax, τexp
+    return plt, τmax, dτmax, τexp
 end 
 function autocorrelation_overview(obs,obslabel,therm;thermstep=1,minlags=100,with_exponential=false,kws...)
     # Assume scalar variable
     # Determine a suitable n_therm by looking at τ as a function 
     # of the thermalisation cut, as well as a histogram of the plaquette
     therms = collect(1:thermstep:length(obs)÷2)
-    τ_therm, Δτ_therm = madras_sokal_time(obs,therms)
+    τ_therm, dτ_therm = madras_sokal_time(obs,therms)
     
     # If therm is too large use the maximal value of thermstep
     therm = min(maximum(therms),therm)
     o = obs[therm:end]
     
-    τ, Δτ = madras_sokal_windows(o)
+    τ, dτ = madras_sokal_windows(o)
     τmax, W = findmax(τ)
-    Δτmax = Δτ[W]
+    dτmax = dτ[W]
 
     # compute exponential autocorrelation time
     if with_exponential
@@ -71,18 +71,18 @@ function autocorrelation_overview(obs,obslabel,therm;thermstep=1,minlags=100,wit
             τexp[i] = exponential_autocorrelation_time(obs[t:end];minlags)
         end
         τexp_therm = exponential_autocorrelation_time(obs[therm:end];minlags)
-        τlabelEXP = L"τ_{\rm exp}=%$(round(τexp_therm,digits=1))" # \pm %$(round(Δτmax,digits=1))"
+        τlabelEXP = L"τ_{\rm exp}=%$(round(τexp_therm,digits=1))" # \pm %$(round(dτmax,digits=1))"
     end
 
     thermlabel = L"n_{therm}=%$therm"
-    τlabel = L"τ_{\rm MS}=%$(round(τmax,digits=1)) \pm %$(round(Δτmax,digits=1))"
+    τlabel = L"τ_{\rm MS}=%$(round(τmax,digits=1)) \pm %$(round(dτmax,digits=1))"
 
-    plt0 = plot(therms, τ_therm, ribbon = Δτ_therm, label="", xlabel=L"n_{\rm therm}", ylabel=L"\tau_{\rm MS}" )
+    plt0 = plot(therms, τ_therm, ribbon = dτ_therm, label="", xlabel=L"n_{\rm therm}", ylabel=L"\tau_{\rm MS}" )
     vline!(plt0,[therm],label=thermlabel,legend=:topright)
     scatter!(plt0,[therm],[τmax],label=τlabel)
     plt1 = serieshistogram(o,ylims=extrema(o),title="")
     plt2 = fit_histogram_plot(o,xlabel=obslabel,ylabel="count",lw=2,color=:red)
-    plt3 = plot(τ, ribbon = Δτ,label="",xlabel=L"window size $W$", ylabel=L"\tau_{\rm MS}")
+    plt3 = plot(τ, ribbon = dτ,label="",xlabel=L"window size $W$", ylabel=L"\tau_{\rm MS}")
     scatter!(plt3,[W],[τmax],label=τlabel)
     
     l = @layout [a; b; c; d]

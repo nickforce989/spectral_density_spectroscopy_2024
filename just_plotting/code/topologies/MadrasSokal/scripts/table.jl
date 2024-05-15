@@ -6,17 +6,16 @@ println("Write table 1...")
 files  = readdir("../../../../CSVs/output_topology/flow_analysis",join=true) 
 
 ispath("../../../../CSVs/output_topology/") || mkpath("../../../../CSVs/output_topology/")
-io1 = open("../../../../CSVs/output_topology/table1_machine_readable.csv","w")
-io2 = open("../../../../CSVs/output_topology/table1_human_readable.csv","w")
-io3 = open("../../../../CSVs/output_topology/table1.tex","w")
+io1 = open("../../../../CSVs/output_topology/gradient_flow_observables.csv","w")
+io3 = open("../../../../tables/table1.tex","w")
 
-write(io1,"beta,T,L,mf,mas,ω0,Δω0,p,Δp,Q,ΔQ,first,last,skip,Nconf\n")
-write(io2,"beta,mas,mf,Nt,Nl,first,skip,Nconf,p,ω0,τ(Q),Q\n")
+write(io1,"beta,T,L,mf,mas,w0,dw0,p,dp,Q,dQ,first,last,skip,Nconf\n")
+#write(io2,"beta,mas,mf,Nt,Nl,first,skip,Nconf,p,w0,τ(Q),Q\n")
 
 for file in files
     T, L, beta, mf,  mas = parse_filename(file)
     header  = readline(file)
-    ω0, Δω0 = parse_ω0(header)
+    w0, dw0 = parse_w0(header)
     # get data for plaquette and topological charge
     data = readdlm(file,',',skipstart=1)
     traj = Int.(data[:,1])
@@ -27,18 +26,17 @@ for file in files
     Nskip = traj[2] - traj[1]
     Nconf = length(traj)
     # get averages
-    p, Δp = stdmean(plaq;bin=2)
-    Q, ΔQ = stdmean(topo;bin=2)
+    p, dp = stdmean(plaq;bin=2)
+    Q, dQ = stdmean(topo;bin=2)
     # calculate autocorrelation times
-    τP, ΔτP = madras_sokal_time(plaq)
-    τQ, ΔτQ = madras_sokal_time(topo)
+    τP, dτP = madras_sokal_time(plaq)
+    τQ, dτQ = madras_sokal_time(topo)
     # write to csv file
-    write(io1,"$beta,$T,$L,$mf,$mas,$ω0,$Δω0,$p,$Δp,$Q,$ΔQ,$Nfirst,$Nlast,$Nskip,$Nconf\n")
-    write(io2,"$beta,$mas,$mf,$T,$L,$Nfirst,$Nskip,$Nconf,$(errorstring(p,Δp)),$(errorstring(ω0,Δω0)),$(errorstring(τQ,ΔτQ)),$(errorstring(Q,ΔQ))\n")
-    write(io3,"$beta & $mas & $mf & $T & $L & $Nfirst & $Nskip & $Nconf & $(errorstring(p,Δp)) & $(errorstring(ω0,Δω0)) & $(errorstring(τQ,ΔτQ)) & $(errorstring(Q,ΔQ))\\\\ \n")
+    write(io1,"$beta,$T,$L,$mf,$mas,$w0,$dw0,$p,$dp,$Q,$dQ,$Nfirst,$Nlast,$Nskip,$Nconf\n")
+    write(io3,"$beta & $mas & $mf & $T & $L & $Nfirst & $Nskip & $Nconf & $(errorstring(p,dp)) & $(errorstring(w0,dw0)) & $(errorstring(τQ,dτQ)) & $(errorstring(Q,dQ))\\\\ \n")
 end
 
 close(io1)
-close(io2)
+#close(io2)
 close(io3)
 

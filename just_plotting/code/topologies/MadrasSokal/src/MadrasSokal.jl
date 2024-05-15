@@ -16,6 +16,6 @@ export serieshistogram
 include("exponential.jl")
 export exponential_autocorrelation_time
 include("utils.jl")
-export stdmean, parse_filename, parse_ω0, plaquettes_tursa, errorstring
+export stdmean, parse_filename, parse_w0, plaquettes_tursa, errorstring
 
 end # module MadrasSokal

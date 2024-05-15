@@ -4,10 +4,10 @@ function parse_filename(file)
     T, L, beta, mf,  mas = Int(val[1]), Int(val[2]), val[3], -val[4], -val[5]
     return T, L, beta, mf,  mas
 end
-function parse_ω0(line)
+function parse_w0(line)
     str = replace(line,r"[a-z,A-Z,,,=,+,--,/,(,)]"=>" ")
-    ω0, Δω0 = parse.(Float64,split(str))[2:3]
-    return ω0, Δω0
+    w0, dw0 = parse.(Float64,split(str))[2:3]
+    return w0, dw0
 end
 function stdmean(X,dims;bin=1)
     N = size(X)[dims]
@@ -44,15 +44,15 @@ function plaquettes_tursa(file)
     plaquettes = getindex(plaquettes,inds)
     return configurations, plaquettes
 end
-function errorstring(x,Δx;nsig=2)
-    @assert Δx > 0
+function errorstring(x,dx;nsig=2)
+    @assert dx > 0
     sgn = x < 0 ? "-" : ""
     x = abs(x)  
     # round error part to desired number of signficant digits
     # convert to integer if no fractional part exists
-    Δx_rounded = round(Δx,sigdigits=nsig) 
+    dx_rounded = round(dx,sigdigits=nsig) 
     # get number of decimal digits for x  
-    floor_log_10 = floor(Int,log10(Δx))
+    floor_log_10 = floor(Int,log10(dx))
     dec_digits   = (nsig - 1) - floor_log_10
     # round x, to desired number of decimal digits 
     # (standard julia function deals with negative dec_digits) 
@@ -60,13 +60,13 @@ function errorstring(x,Δx;nsig=2)
     # get decimal and integer part if there is a decimal part
     if dec_digits > 0
         digits_val = Int(round(x_rounded*10.0^(dec_digits)))
-        digits_unc = Int(round(Δx_rounded*10.0^(dec_digits)))
+        digits_unc = Int(round(dx_rounded*10.0^(dec_digits)))
         str_val = _insert_decimal(digits_val,dec_digits) 
         str_unc = _insert_decimal(digits_unc,dec_digits)
         str_unc = nsig > dec_digits ? str_unc : string(digits_unc)
         return sgn*"$str_val($str_unc)"
     else
-        return sgn*"$(Int(x_rounded))($(Int(Δx_rounded)))"
+        return sgn*"$(Int(x_rounded))($(Int(dx_rounded)))"
     end
 end
 function _insert_decimal(val::Int,digits)

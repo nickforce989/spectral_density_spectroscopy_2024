@@ -52,7 +52,7 @@ CHs = [
     ["id"],
 ]
 
-CHs_tag = ["g5", "gi", "g0gi", "g5gi", "g0g5gi", "id"]
+
 CHs_name = ["PS", "V", "T", "AV", "AT", "S"]
 
 
@@ -66,7 +66,8 @@ CHs = [
 
 CHs_tag = "VnT"
 
-ensembles = ['64x20x20x20b6.5mf0.71mas1.01','64x20x20x20b6.5mf0.70mas1.01','48x20x20x20b6.5mf0.71mas1.01','96x20x20x20b6.5mf0.71mas1.01','64x32x32x32b6.5mf0.72mas1.01']
+#ensembles = ['64x20x20x20b6.5mf0.71mas1.01','64x20x20x20b6.5mf0.70mas1.01','48x20x20x20b6.5mf0.71mas1.01','96x20x20x20b6.5mf0.71mas1.01','64x32x32x32b6.5mf0.72mas1.01']
+ensembles = ['64x20x20x20b6.5mf0.71mas1.01']
 
 for ens in ensembles:
     print(ens)
@@ -137,9 +138,10 @@ for ens in ensembles:
 
 results = pd.read_csv("./CSVs/F_meson_GEVP.csv")
 
-ensembles = ['64x20x20x20b6.5mf0.71mas1.01','64x20x20x20b6.5mf0.70mas1.01','48x20x20x20b6.5mf0.71mas1.01','96x20x20x20b6.5mf0.71mas1.01','64x32x32x32b6.5mf0.72mas1.01']
+#ensembles = ['64x20x20x20b6.5mf0.71mas1.01','64x20x20x20b6.5mf0.70mas1.01','48x20x20x20b6.5mf0.71mas1.01','96x20x20x20b6.5mf0.71mas1.01','64x32x32x32b6.5mf0.72mas1.01']
+ensembles = ['64x20x20x20b6.5mf0.71mas1.01']
 
-
+CHs_tag = ["g5", "gi", "g0gi", "g5gi", "g0g5gi", "id"]
 
 for ens in ensembles:
     print(ens)
