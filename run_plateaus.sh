@@ -1,5 +1,7 @@
 #!/bin/bash
 
+bash check_latex.sh
+
 cd plateaus
 #python record_meson_F.py
 #python analysis_F.py

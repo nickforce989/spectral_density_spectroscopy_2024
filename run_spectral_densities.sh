@@ -1,5 +1,7 @@
 #!/bin/bash
 
+bash check_latex.sh
+
 directory="input_fit"
 subdirs=("M1" "M2" "M3" "M4" "M5")
 all_subdirs_present=true
