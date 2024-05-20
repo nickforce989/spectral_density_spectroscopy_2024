@@ -207,8 +207,9 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         file_path = os.path.join(path, file_name)
         with open(file_path, "r") as file:
             lines = file.readlines()
-            for j, line in enumerate(lines):
+            for j, line in enumerate(lines[:nboot]):
                 values = line.split()
+                #print(values)
                 rho_resampled[j, i] = float(values[1])
 
     rho_T = rho_resampled.T
@@ -1193,14 +1194,14 @@ if four_fit is True:
 
 matrix_4D, k_peaks, Nboot_fit  = read_csv()
 ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-#ensembles = ['M3']
+#ensembles = ['M2']
 mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
 #mesonic_channels = ['gi']
 reps = ['fund', 'as']
 #reps = ['fund']
 kerneltype = ['GAUSS', 'CAUCHY']
 #kerneltype = ['GAUSS']
-#ensemble_num = 2
+#ensemble_num = 1
 #channel_num = 1
 
 headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]
@@ -1248,5 +1249,6 @@ for index, ensemble in enumerate(ensembles):
                     elif fit_peaks_switch == 1:
                         output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
 
+                    #Nboot_fit[ensemble_num] = 200
                     perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
                                     plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch)
