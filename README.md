@@ -46,7 +46,9 @@ Maurizio Piai, Davide Vadacchino.
    as discussed above.
    * To reproduce all the plots and results in the tables present in the paper, please run
      ``reproduce_everything.sh``. The results will be found in ``plots/`` and ``tables/``.
-   * If ``latex`` is detected in the system, the full workflow will be ran. Otherwise, CSVs files will be produced in ``CSVs/``. Plots and tex tables can be produced in a second moment, by running ``plots_and_tables.sh`` having all the output CSV files in ``CSVs``.
+   * If ``latex`` is detected in the system, the full workflow will be ran. Otherwise, CSVs files will be produced in ``CSVs/``. 
+        * In such a case, make sure that all the output CSV files in ``CSVs``. Then, plots and tex tables can be produced in a second 
+        moment, by running ``plots_and_tables.sh`` .
 
 * Otherwise, each individual step can be achieved separately:
 
