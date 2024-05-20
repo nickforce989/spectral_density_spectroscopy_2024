@@ -29,14 +29,14 @@ Maurizio Piai, Davide Vadacchino.
   with the caveat that if you're using an Apple silicon CPU then you need to use Conda 24.3 or later, and specify ```--platform osx-64```
   in your ```conda env create``` call.
 
-* Then, install ``julia`` using conda
-
-      conda install -c conda-forge julia
-
 
 * Once the environment is created, you can active the it:
 
       conda activate analysis-env
+
+* Then, install ``julia`` using conda
+
+      conda install -c conda-forge julia
 
 ## Code usage
 
