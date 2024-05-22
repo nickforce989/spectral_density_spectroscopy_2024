@@ -2,25 +2,41 @@ import pandas as pd
 import numpy as np
 
 def add_error(channel_E0, err):
-    #print(channel_E0)
-    if channel_E0 != 0:
-        if (not np.isnan(channel_E0)):
-            # Splitting the value of err_channel_E0 into integer and fractional parts
-            integer_part, fractional_part = str(err).split('.')
-            fractional_part = fractional_part.lstrip('0')  # Removing leading zeros
+    if channel_E0 != 0 and not np.isnan(channel_E0):
+        #print(err)
+        # Convert the error to a string with significant digits
+        err_str = f"{err:.2g}".replace('.', '')  # Convert error to string with 2 significant digits and remove decimal
+        #print(err_str)
+        # Count leading zeros
+        leading_zeros = len(err_str) - len(err_str.lstrip('0'))
 
-            # Formatting the output as desired
-            if fractional_part:
-                # Strip leading zeros and format the output
-                channel_E0_with_error = f"{channel_E0}({integer_part.rstrip('0')}{fractional_part})"
-            else:
-                # If there is no fractional part, just use the integer part
-                channel_E0_with_error = f"{channel_E0}({integer_part})"
-        else:
-            channel_E0_with_error = '-'
+        # Remove leading zeros
+        err_str = err_str.lstrip('0')
+
+        #print(err_str)
+        if len(str(err_str)) == 1:
+            err_str = str(int(err_str)*10)
+        # Determine the number of significant digits in the error
+        err_significant_digits = len(err_str) + leading_zeros
+
+
+        # Format the channel_E0 value with the correct number of significant digits
+        # Calculate the format precision for the channel_E0 value
+        int_part_length = len(str(int(channel_E0)).replace('.', ''))
+        format_precision = max(err_significant_digits - int_part_length, 0)
+        format_str = f"{{:.{format_precision}f}}"
+        channel_E0_str = format_str.format(channel_E0)
+
+        #print(len(str(err_str)))
+        #print(err_str)
+
+
+        # Combine the channel_E0 value with the error part
+        channel_E0_with_error = f"{channel_E0_str}({err_str})"
     else:
         channel_E0_with_error = '-'
     return channel_E0_with_error
+
 
 
 # Read CSV files
@@ -55,45 +71,133 @@ for n in range(3):
                 CHANNEL = 'PS'
                 try:
                     row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
-                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 5)
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
                     err_row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
-                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 5)
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
                 except KeyError:
                     channel_E0 = '-'
                     err_channel_E0 = '-'
             # Add similar try-except blocks for other conditions
             elif channel == 'g5' and repr == 'as':
                 CHANNEL = 'ps'
+                try:
+                    row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'gi' and repr == 'fund':
                 CHANNEL = 'V'
+                try:
+                    row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'gi' and repr == 'as':
                 CHANNEL = 'v'
+                try:
+                    row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'g0gi' and repr == 'fund':
                 CHANNEL = 'T'
+                try:
+                    row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'g0gi' and repr == 'as':
                 CHANNEL = 't'
+                try:
+                    row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'g5gi' and repr == 'fund':
                 CHANNEL = 'AV'
+                try:
+                    row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'g5gi' and repr == 'as':
                 CHANNEL = 'av'
+                try:
+                    row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'g0g5gi' and repr == 'fund':
                 CHANNEL = 'AT'
+                try:
+                    row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'g0g5gi' and repr == 'as':
                 CHANNEL = 'at'
+                try:
+                    row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'id' and repr == 'fund':
                 CHANNEL = 'S'
+                try:
+                    row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = f_meson_gevp[f_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
             elif channel == 'id' and repr == 'as':
                 CHANNEL = 's'
+                try:
+                    row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    channel_E0 = round(row2[f"{channel}_E{n}"].values[0], 4)
+                    err_row2 = as_meson_gevp[as_meson_gevp['ENS'].str.contains(prefix[index])]
+                    err_channel_E0 = round(row2[f"{channel}_E{n}_error"].values[0], 4)
+                except KeyError:
+                    channel_E0 = '-'
+                    err_channel_E0 = '-'
                 # Add similar try-except blocks for other conditions
 
             # print(CHANNEL)
@@ -162,3 +266,4 @@ for n in range(3):
 
         # Print confirmation message
         print("Tables generated and saved in output_table.tex")
+
