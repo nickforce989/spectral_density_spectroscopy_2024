@@ -32,8 +32,27 @@ for file in files
     τP, dτP = madras_sokal_time(plaq)
     τQ, dτQ = madras_sokal_time(topo)
     # write to csv file
-    write(io1,"$beta,$T,$L,$mf,$mas,$w0,$dw0,$p,$dp,$Q,$dQ,$Nfirst,$Nlast,$Nskip,$Nconf\n")
-    write(io3,"$beta & $mas & $mf & $T & $L & $Nfirst & $Nskip & $Nconf & $(errorstring(p,dp)) & $(errorstring(w0,dw0)) & $(errorstring(τQ,dτQ)) & $(errorstring(Q,dQ))\\\\ \n")
+    #write(io1,"ensemble,beta,T,L,mf,mas,w0,dw0,p,dp,Q,dQ,first,last,skip,Nconf\n")
+    #write(io2,"ensemble,beta,mas,mf,Nt,Nl,first,skip,Nconf,p,w0,tau(Q),Q\n")
+
+    function ensemble_name(T,mf)
+        T == 48 && return "M1"
+        T == 64 && isapprox(mf,-0.71) && return "M2"
+        T == 96 && return "M3"
+        T == 64 && isapprox(mf,-0.70) && return "M4"
+        T == 64 && isapprox(mf,-0.72) && return "M5"
+    end
+    
+
+    # get ensemble name 
+    MX = ensemble_name(T,mf)
+    # write to csv file
+    write(io1,"$MX,$beta,$T,$L,$mf,$mas,$w0,$dw0,$p,$dp,$Q,$dQ,$Nfirst,$Nlast,$Nskip,$Nconf\n")
+    #write(io2,"$MX,$beta,$mas,$mf,$T,$L,$Nfirst,$Nskip,$Nconf,$(errorstring(p,Δp)),$(errorstring(ω0,Δω0)),$(errorstring(τQ,ΔτQ)),$(errorstring(Q,ΔQ))\n")
+    write(io3,"$MX & $beta & $mas & $(rpad(mf,5,'0')) & $T & $L & $Nfirst & $Nskip & $Nconf & $(errorstring(p,dp)) & $(errorstring(w0,dw0)) & $(errorstring(τQ,dτQ)) & $(errorstring(Q,dQ))\\\\ \n")
+
+    #write(io1,"$beta,$T,$L,$mf,$mas,$w0,$dw0,$p,$dp,$Q,$dQ,$Nfirst,$Nlast,$Nskip,$Nconf\n")
+    #write(io3,"$beta & $mas & $mf & $T & $L & $Nfirst & $Nskip & $Nconf & $(errorstring(p,dp)) & $(errorstring(w0,dw0)) & $(errorstring(τQ,dτQ)) & $(errorstring(Q,dQ))\\\\ \n")
 end
 
 close(io1)

@@ -12,10 +12,10 @@ println("Plaquette autocorrelation...")
 files  = readdir("../../../../input_topology/plaquettes",join=true) 
 param = readdlm("../../../../CSVs/output_topology/gradient_flow_observables.csv",',',skipstart=1)
 
-therms = Int.(param[:,12])
-T = Int.(param[:,2])
-L = Int.(param[:,3])
-β = param[:,1]
+therms = Int.(param[:,13])
+T = Int.(param[:,3])
+L = Int.(param[:,4])
+β = param[:,2]
 
 for i in eachindex(files)
     file = files[i]
