@@ -61,43 +61,8 @@ def read_csv():
         for ensemble in ensembles
     ]
     return matrix_4D, k_peaks, Nboot_fit
-def read_csv2(file_path):
-    ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-    categories = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
-    repr = ['fund', 'as']
-    ratio1 = {}
-    ratio2 = {}
-    with open(file_path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            ensemble = row['Ensemble']
-            # Initialize lists for each ensemble if not already present
-            if ensemble not in ratio1:
-                ratio1[ensemble] = []
-                ratio2[ensemble] = []
-
-            for rep in repr:
-                # Append data for each category to the respective lists
-                for category in categories:
-                    if row[f'{category}_{rep}_ratio2'] != ' ':
-                        ratio1[ensemble].append(float(row[f'{category}_{rep}_ratio1']))
-                        ratio2[ensemble].append(0.0)
-                    else:
-                        ratio1[ensemble].append(float(row[f'{category}_{rep}_ratio1']))
-                        ratio2[ensemble].append(float(row[f'{category}_{rep}_ratio2']))
-    # Create a 2D matrix with ensemble index
-    matrix_2D = [
-        [
-            ensemble,
-            ratio1[ensemble],
-            ratio2[ensemble],
-        ]
-        for ensemble in ensembles
-    ]
-    return matrix_2D
-
 def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
-                plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks, kerneltype, nboot, fit_peaks_switch, matrix_2D):
+                plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks, kerneltype, nboot, fit_peaks_switch):
     ####################################################################################
     '''
     # Extract directory path
@@ -196,7 +161,6 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         )
         return model
 
-
     # Smearing radius in ratio with Mpi
     print(LogMessage(), "################### General Fit info #############################")
     if fit_peaks_switch == 0:
@@ -245,6 +209,7 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
             lines = file.readlines()
             for j, line in enumerate(lines[:nboot]):
                 values = line.split()
+                #print(values)
                 rho_resampled[j, i] = float(values[1])
 
     rho_T = rho_resampled.T
@@ -339,75 +304,47 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.8, 3e-7, 2.1]
                 params, _ = curve_fit(four_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit, amp4_fit, mean4_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
-                mean3_fit = matrix_2D[ensemble_num][2][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.8, 3e-7, 2.1]
                 params, _ = curve_fit(four_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit, amp4_fit, mean4_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
-                mean3_fit = matrix_2D[ensemble_num][2][channel_num]
         elif (triple_fit == True and four_fit == False):
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.9]
                 params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
-                mean3_fit = matrix_2D[ensemble_num][2][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 2.1]
                 params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
-                mean3_fit = matrix_2D[ensemble_num][2][channel_num]
         elif (triple_fit == False and four_fit == False):
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
                 params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
                 params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
-                mean1_fit = mpi
-                #print('ciao: ', mean2_fit)
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
-                #print('ciao2: ', mean2_fit)
     elif fit_peaks_switch == 1:
         if triple_fit == True:
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.9]
                 params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
-                mean3_fit = matrix_2D[ensemble_num][2][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 2.1]
                 params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
-                mean3_fit = matrix_2D[ensemble_num][2][channel_num]
         elif (triple_fit == False and four_fit == False):
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
                 params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
                 params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
-                mean1_fit = mpi
-                mean2_fit = matrix_2D[ensemble_num][1][channel_num]
 
 
     #print(params)
@@ -417,21 +354,21 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     if fit_peaks_switch == 0:
         params = Parameters()
         params.add("amplitude_1", value=amp1_fit, min=amp1_fit - 0.4*amp1_fit, max=amp1_fit+ 0.4*amp1_fit)
-        params.add("mean_1", value=1.0, min=0.98, max=1.02)
+        params.add("mean_1", value=1.0, min=0.96, max=1.04)
         params.add("amplitude_2", value=amp2_fit, min=amp2_fit - 0.4*amp2_fit, max=amp2_fit+ 0.4*amp2_fit)
-        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.06, max=mean2_fit + 0.06)
+        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.25, max=mean2_fit + 0.25)
         if triple_fit is True:
             params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
-            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.4, max=mean3_fit + 0.4)
+            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.5, max=mean3_fit + 0.5)
         if four_fit is True:
             params.add("amplitude_4", value=amp4_fit, min=amp4_fit - 0.4*amp4_fit, max=amp4_fit+ 0.4*amp4_fit)
-            params.add("mean_4", value=mean4_fit, min=mean4_fit - 0.4, max=mean4_fit + 0.4)
+            params.add("mean_4", value=mean4_fit, min=mean4_fit - 0.5, max=mean4_fit + 0.5)
     elif fit_peaks_switch == 1:
         params = Parameters()
         params.add("amplitude_1", value=amp1_fit, min=amp1_fit - 0.4*amp1_fit, max=amp1_fit+ 0.4*amp1_fit)
-        params.add("mean_1", value=1.0, min=0.98, max=1.02)
+        params.add("mean_1", value=1.0, min=0.96, max=1.04)
         params.add("amplitude_2", value=amp2_fit, min=amp2_fit - 0.4*amp2_fit, max=amp2_fit+ 0.4*amp2_fit)
-        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.06, max=mean2_fit + 0.06)
+        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.25, max=mean2_fit + 0.25)
         if triple_fit is True:
             params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
             params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.5, max=mean3_fit + 0.5)
@@ -595,19 +532,19 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     amplitude2 = np.average(amplitude_vals2)
     damplitude2 = 0.25*np.std(amplitude_vals2)
     mean1 = np.average(mean_vals1)
-    dmean1 = 0.5*np.std(mean_vals1)
+    dmean1 = 0.25*np.std(mean_vals1)
     mean2 = np.average(mean_vals2)
-    dmean2 = 0.75*np.std(mean_vals2)
+    dmean2 = 0.25*np.std(mean_vals2)
     if triple_fit is True:
         amplitude3 = np.average(amplitude_vals3)
         damplitude3 = 0.25*np.std(amplitude_vals3)
         mean3 = np.average(mean_vals3)
-        dmean3 = 0.75*np.std(mean_vals3)
+        dmean3 = 0.25*np.std(mean_vals3)
     if four_fit is True:
         amplitude4 = np.average(amplitude_vals4)
         damplitude4 = 0.25*np.std(amplitude_vals4)
         mean4 = np.average(mean_vals4)
-        dmean4 = 0.75*np.std(mean_vals4)
+        dmean4 = 0.25*np.std(mean_vals4)
 
     y_gaussian_1 = [[0] * len(x_fit) for _ in range(nboot)]
     y_gaussian_2 = [[0] * len(x_fit) for _ in range(nboot)]
@@ -1242,7 +1179,6 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     # Display the plot
     #plt.show()
     return None
-
 ########################### Preferences ################################
 # If you want to fit with Cauchy (False == Gaussians)
 cauchy_fit = True
@@ -1257,18 +1193,16 @@ if four_fit is True:
     triple_fit = True
 
 matrix_4D, k_peaks, Nboot_fit  = read_csv()
-file_path_MD = './metadata/ratioguesses_spectrum.csv'
-matrix_2D = read_csv2(file_path_MD)
-ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-#ensembles = ['M3']
-mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
-#mesonic_channels = ['gi']
-reps = ['fund', 'as']
-#reps = ['fund']
-kerneltype = ['GAUSS', 'CAUCHY']
-#kerneltype = ['GAUSS']
-#ensemble_num = 2
-#channel_num = 1
+#ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
+ensembles = ['M5']
+#mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
+mesonic_channels = ['g0gi']
+#reps = ['fund', 'as']
+reps = ['fund']
+#kerneltype = ['GAUSS', 'CAUCHY']
+kerneltype = ['CAUCHY']
+ensemble_num = 4
+channel_num = 2
 
 headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]
 headers.extend(["aE_2", "errorE2"])
@@ -1282,14 +1216,14 @@ for index, ensemble in enumerate(ensembles):
     with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
-    ensemble_num = index
+    #ensemble_num = index
     for rep in reps:
         for k, channel in enumerate(mesonic_channels):
             for kernel in kerneltype:
                 for fit_peaks_switch in range(2):
                     new_k_peaks = k_peaks[ensemble][k] + 1
                     old_k_peaks = k_peaks[ensemble][k]
-                    channel_num = k
+                    #channel_num = k
                     if rep == 'as':
                         channel_num += 6
 
@@ -1315,10 +1249,6 @@ for index, ensemble in enumerate(ensembles):
                     elif fit_peaks_switch == 1:
                         output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
 
+                    #Nboot_fit[ensemble_num] = 200
                     perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
-                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
-
-
-
-
-#print(matrix_2D)
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch)
