@@ -22,6 +22,14 @@ from lsdensities.InverseProblemWrapper import AlgorithmParameters, InverseProble
 from lsdensities.utils.rhoUtils import MatrixBundle
 import random
 def main():
+    def get_directory_size(directory):
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(directory):
+            for filename in filenames:
+                filepath = os.path.join(dirpath, filename)
+                if os.path.isfile(filepath):
+                    total_size += os.path.getsize(filepath)
+        return total_size
     def init_variables(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi):
         in_ = Inputs()
         in_.tmax = 0
@@ -145,8 +153,8 @@ def main():
     # Mesonic channels
     mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
     # Ensembles: M1, M2, M3, M4, M5
-    #ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-    ensembles = ['M1', 'M2']
+    ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
+    #ensembles = ['M1', 'M2']
     # Roots in HDF5 for each ensemble
     roots = ['chimera_out_48x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
              'chimera_out_64x20x20x20nc4nf2nas3b6.5mf0.71mas1.01_APE0.4N50_smf0.2as0.12_s1',
@@ -248,7 +256,27 @@ def main():
         e0 = 0.0
         Na = 1
         A0cut = 0.1
-        findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi)
+        current_directory = os.getcwd()  # Get the current working directory
+        subdirectory_path = os.path.join(current_directory, outdir)  # Create the full path to the subdirectory
+
+        if os.path.isdir(subdirectory_path):
+            directory_size = get_directory_size(subdirectory_path)
+            size_in_megabytes = directory_size / (1024 * 1024)  # Convert bytes to megabytes
+            print(f"Size of the subdirectory '{outdir}': {size_in_megabytes:.2f} MB")
+            if size_in_megabytes >= 12:
+                print(f"The subdirectory '{outdir}' exists and its size is at least 12 MB.")
+            else:
+                print(f"The subdirectory '{outdir}' does not exist or its size is less than 12 MB.")
+                findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi)
+        else:
+            print(f"The subdirectory '{outdir}' does not exist or its size is less than 12 MB.")
+            directory_size = get_directory_size(subdirectory_path)
+            size_in_megabytes = directory_size / (1024 * 1024)  # Convert bytes to megabytes
+            print(f"Size of the subdirectory '{outdir}': {size_in_megabytes:.2f} MB")
+            findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi)
+
+
+
     ################# Download and use lsdensities on correlators ########################
     # Replace 'your_file.h5' with the path to your HDF5 file
     file_path = '../input_correlators/chimera_data_full.hdf5'
