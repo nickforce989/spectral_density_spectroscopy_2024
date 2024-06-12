@@ -597,7 +597,7 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     mean1 = np.average(mean_vals1)
     dmean1 = 1.0*np.std(mean_vals1)
     mean2 = np.average(mean_vals2)
-    dmean2 = 1.0*np.std(mean_vals2)
+    dmean2 = 2.0*np.std(mean_vals2)
     if triple_fit is True:
         amplitude3 = np.average(amplitude_vals3)
         damplitude3 = 0.25*np.std(amplitude_vals3)
