@@ -417,9 +417,9 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     if fit_peaks_switch == 0:
         params = Parameters()
         params.add("amplitude_1", value=amp1_fit, min=amp1_fit - 0.4*amp1_fit, max=amp1_fit+ 0.4*amp1_fit)
-        params.add("mean_1", value=1.0, min=0.98, max=1.02)
+        params.add("mean_1", value=1.0, min=0.99, max=1.01)
         params.add("amplitude_2", value=amp2_fit, min=amp2_fit - 0.4*amp2_fit, max=amp2_fit+ 0.4*amp2_fit)
-        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.06, max=mean2_fit + 0.06)
+        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.02, max=mean2_fit + 0.02)
         if triple_fit is True:
             params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
             params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.4, max=mean3_fit + 0.4)
@@ -429,17 +429,17 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     elif fit_peaks_switch == 1:
         params = Parameters()
         params.add("amplitude_1", value=amp1_fit, min=amp1_fit - 0.4*amp1_fit, max=amp1_fit+ 0.4*amp1_fit)
-        params.add("mean_1", value=1.0, min=0.98, max=1.02)
+        params.add("mean_1", value=1.0, min=0.99, max=1.01)
         params.add("amplitude_2", value=amp2_fit, min=amp2_fit - 0.4*amp2_fit, max=amp2_fit+ 0.4*amp2_fit)
-        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.06, max=mean2_fit + 0.06)
+        params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.02, max=mean2_fit + 0.02)
+        params.add("amplitude_3", value=1e-14, min=0.0, max=1e-10)
+        params.add("mean_3", value=3.5, min=3.0, max=4.0)
         if triple_fit is True:
             params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
-            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.5, max=mean3_fit + 0.5)
+            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.2, max=mean3_fit + 0.2)
             params.add("amplitude_4", value=1e-14, min=0.0, max=1e-10)
             params.add("mean_4", value=4.5, min=4.0, max=5.0)
             four_fit = True
-        params.add("amplitude_3", value=1e-14, min=0.0, max=1e-10)
-        params.add("mean_3", value=3.5, min=3.0, max=4.0)
         triple_fit = True
 
     #####################################################################################
@@ -595,9 +595,9 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     amplitude2 = np.average(amplitude_vals2)
     damplitude2 = 0.25*np.std(amplitude_vals2)
     mean1 = np.average(mean_vals1)
-    dmean1 = 0.5*np.std(mean_vals1)
+    dmean1 = 1.0*np.std(mean_vals1)
     mean2 = np.average(mean_vals2)
-    dmean2 = 1.25*np.std(mean_vals2)
+    dmean2 = 1.0*np.std(mean_vals2)
     if triple_fit is True:
         amplitude3 = np.average(amplitude_vals3)
         damplitude3 = 0.25*np.std(amplitude_vals3)
@@ -1260,14 +1260,14 @@ matrix_4D, k_peaks, Nboot_fit  = read_csv()
 file_path_MD = './metadata/ratioguesses_spectrum.csv'
 matrix_2D = read_csv2(file_path_MD)
 ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-#ensembles = ['M3']
+ensembles = ['M2']
 mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
 #mesonic_channels = ['id']
 reps = ['fund', 'as']
 #reps = ['as']
 kerneltype = ['GAUSS', 'CAUCHY']
 #kerneltype = ['CAUCHY']
-#ensemble_num = 2
+ensemble_num = 1
 #channel_num = 5
 
 headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]
@@ -1282,7 +1282,7 @@ for index, ensemble in enumerate(ensembles):
     with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
-    ensemble_num = index
+    #ensemble_num = index
     for rep in reps:
         for k, channel in enumerate(mesonic_channels):
             for kernel in kerneltype:
