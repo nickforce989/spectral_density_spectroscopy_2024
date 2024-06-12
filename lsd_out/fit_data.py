@@ -422,7 +422,7 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         params.add("mean_2", value=mean2_fit, min=mean2_fit - 0.02, max=mean2_fit + 0.02)
         if triple_fit is True:
             params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
-            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.4, max=mean3_fit + 0.4)
+            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.15, max=mean3_fit + 0.15)
         if four_fit is True:
             params.add("amplitude_4", value=amp4_fit, min=amp4_fit - 0.4*amp4_fit, max=amp4_fit+ 0.4*amp4_fit)
             params.add("mean_4", value=mean4_fit, min=mean4_fit - 0.4, max=mean4_fit + 0.4)
@@ -436,7 +436,7 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         params.add("mean_3", value=3.5, min=3.0, max=4.0)
         if triple_fit is True:
             params.add("amplitude_3", value=amp3_fit, min=amp3_fit - 0.4*amp3_fit, max=amp3_fit+ 0.4*amp3_fit)
-            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.2, max=mean3_fit + 0.2)
+            params.add("mean_3", value=mean3_fit, min=mean3_fit - 0.15, max=mean3_fit + 0.15)
             params.add("amplitude_4", value=1e-14, min=0.0, max=1e-10)
             params.add("mean_4", value=4.5, min=4.0, max=5.0)
             four_fit = True
