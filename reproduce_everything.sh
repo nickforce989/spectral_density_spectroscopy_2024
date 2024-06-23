@@ -17,7 +17,7 @@ if ! command -v latex > /dev/null 2>&1; then
         count=$(find . -maxdepth 1 -name "*_meson*" | wc -l)
         echo "Found $count subdirectories matching $subdir/*_meson*"
         echo "$count"
-        if [ "$count" -ne 6 ]; then
+        if [ "$count" -ne 5 ]; then
             inner_condition_met=false
             break
         fi
@@ -40,7 +40,7 @@ else
         count=$(find . -maxdepth 1 -name "*_meson*" | wc -l)
         echo "Found $count subdirectories matching $subdir/*_meson*"
         echo "$count"
-        if [ "$count" -ne 6 ]; then
+        if [ "$count" -ne 5 ]; then
             inner_condition_met=false
             break
         fi
