@@ -1260,14 +1260,14 @@ matrix_4D, k_peaks, Nboot_fit  = read_csv()
 file_path_MD = './metadata/ratioguesses_spectrum.csv'
 matrix_2D = read_csv2(file_path_MD)
 ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-ensembles = ['M2']
+#ensembles = ['M2']
 mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
 #mesonic_channels = ['id']
 reps = ['fund', 'as']
 #reps = ['as']
 kerneltype = ['GAUSS', 'CAUCHY']
 #kerneltype = ['CAUCHY']
-ensemble_num = 1
+#ensemble_num = 1
 #channel_num = 5
 
 headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]
@@ -1282,7 +1282,7 @@ for index, ensemble in enumerate(ensembles):
     with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
-    #ensemble_num = index
+    ensemble_num = index
     for rep in reps:
         for k, channel in enumerate(mesonic_channels):
             for kernel in kerneltype:
