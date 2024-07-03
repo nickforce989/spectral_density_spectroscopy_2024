@@ -10,7 +10,7 @@ def plot_error_bars(ax, centers, errors, colors, labels, heights, errorbar_linew
 
 def main():
     # Read data from the TXT file
-    file_path = 'improving_spectrum_nt.txt'
+    file_path = '../../../input_fit/improving_spectrum/improving_spectrum_nt.txt'
     data = np.loadtxt(file_path)
 
     num_rows, num_columns = data.shape

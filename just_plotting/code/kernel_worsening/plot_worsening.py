@@ -10,9 +10,9 @@ plt.style.use("paperdraft.mplstyle")
 
 # Assuming you have the necessary data in Kernel1.txt and Kernel2.txt
 # Load data from files
-data_kernel1 = np.loadtxt('kernel_0.4211936842105263.txt')
-data_kernel2 = np.loadtxt('kernel_0.6274926315789473.txt')
-data_kernel3 = np.loadtxt('kernel_0.782216842105263.txt')
+data_kernel1 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.4211936842105263.txt')
+data_kernel2 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.6274926315789473.txt')
+data_kernel3 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.782216842105263.txt')
 
 # Extract energies and y-values from the data
 energies = np.linspace(0.1 * 0.4083, 3.0 * 0.4083, len(data_kernel1))

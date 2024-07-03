@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 plt.style.use("paperdraft.mplstyle")
 plt.figure(figsize=(7, 4.5))
 # Load data from gauss_curves.txt
-gauss_data = np.loadtxt("gauss_curves.txt")
+gauss_data = np.loadtxt("../../../input_fit/Fig7/gauss_curves.txt")
 
 # Extracting mean, amplitude, and error values for each gaussian curve
 mean1, amplitude1, err_amplitude1 = gauss_data[0]
@@ -45,7 +45,7 @@ for j in range(len(x_values)):
 plt.fill_between(x_values / mpi, lower_band, upper_band, alpha=0.25, color='orange')
 
 # Load data from sp_dens_datapoints.txt
-data_points = np.loadtxt("sp_dens_datapoints_gauss.txt")
+data_points = np.loadtxt("../../../input_fit/Fig7/sp_dens_datapoints_gauss.txt")
 
 # Extracting energy and spdens values
 energy, spdens, err_spdens = data_points[:,0], data_points[:,1], data_points[:,2]

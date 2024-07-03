@@ -11,7 +11,7 @@ cool_colors = ['#1f78b4', '#33a02c', '#6a3d9a', '#e31a1c']
 cauchy_marker_styles = ['o', 's', 'D', '^', 'v', '<']
 
 # Read data from the file
-file_path = 'spectrum_ground_as.txt'
+file_path = '../../../input_fit/systematic_errors/spectrum_ground_as.txt'
 data = np.loadtxt(file_path)
 
 x = np.arange(1, 7)

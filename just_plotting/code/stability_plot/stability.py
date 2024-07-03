@@ -82,5 +82,5 @@ def plot_stability_multiple_alpha(log_files, save_plot=True, n_alphas=2):
     #plt.show()
 
 if __name__ == "__main__":
-    log_files = ["InverseProblemLOG_AlphaA.log", "InverseProblemLOG_AlphaB.log", "InverseProblemLOG_AlphaC.log"]
+    log_files = ["../../../input_fit/stability_plot/InverseProblemLOG_AlphaA.log", "../../../input_fit/stability_plot/InverseProblemLOG_AlphaB.log", "../../../input_fit/stability_plot/InverseProblemLOG_AlphaC.log"]
     plot_stability_multiple_alpha(log_files, save_plot=True, n_alphas=3)

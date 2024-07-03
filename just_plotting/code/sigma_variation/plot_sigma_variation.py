@@ -7,15 +7,15 @@ plt.style.use("paperdraft.mplstyle")
 plt.figure(figsize=(4.5, 8.0))
 
 # Read data from the first file
-filename1 = 'varying_sigma_s0p3.txt'
+filename1 = '../../../input_fit/sigma_variation/varying_sigma_s0p3.txt'
 data1 = np.loadtxt(filename1)
 
 # Read data from the second file
-filename2 = 'varying_sigma_s0p1.txt'
+filename2 = '../../../input_fit/sigma_variation/varying_sigma_s0p1.txt'
 data2 = np.loadtxt(filename2)
 
 # Read data from the third file
-filename3 = 'varying_sigma_s0p7.txt'
+filename3 = '../../../input_fit/sigma_variation/varying_sigma_s0p7.txt'
 data3 = np.loadtxt(filename3)
 
 mpi = 0.33

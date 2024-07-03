@@ -11,9 +11,9 @@ plt.style.use("paperdraft.mplstyle")
 plt.figure(figsize=(6, 4.0))
 # Assuming you have the necessary data in Kernel1.txt and Kernel2.txt
 # Load data from files
-data_kernel1 = np.loadtxt('Kernel1.txt')
-data_kernel2 = np.loadtxt('Kernel2.txt')
-data_kernel3 = np.loadtxt('Kernel3.txt')
+data_kernel1 = np.loadtxt('../../../input_fit/kernel_comparisons_nt/Kernel1.txt')
+data_kernel2 = np.loadtxt('../../../input_fit/kernel_comparisons_nt/Kernel2.txt')
+data_kernel3 = np.loadtxt('../../../input_fit/kernel_comparisons_nt/Kernel3.txt')
 
 # Extract energies and y-values from the data
 energies = np.linspace(0.05 * 0.4054, 4.0 * 0.4054, len(data_kernel1))

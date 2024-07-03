@@ -14,8 +14,8 @@ plt.style.use("paperdraft.mplstyle")
 plt.figure(figsize=(5, 3.5))
 # Assuming you have the necessary data in Kernel1.txt and Kernel2.txt
 # Load data from files
-data_kernel1 = np.loadtxt('gauss_kernel_0.2285857894736842.txt')
-data_kernel2 = np.loadtxt('cauchy_kernel_0.2285857894736842.txt')
+data_kernel1 = np.loadtxt('../../../input_fit/two_kernels/gauss_kernel_0.2285857894736842.txt')
+data_kernel2 = np.loadtxt('../../../input_fit/two_kernels/cauchy_kernel_0.2285857894736842.txt')
 
 # Extract energies and y-values from the data
 energies = np.linspace(0.05 * 0.4054, 2.65 * 0.4054 - 0.07, len(data_kernel1)*10)

@@ -43,7 +43,7 @@ def process_line(line):
     return stat_measurement, stat_err, max_diff
 
 # Read input file for M1_ground
-with open('M1_ground.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M1_ground.txt', 'r') as file:
     lines = file.readlines()
 
 values_ground1 = []
@@ -58,7 +58,7 @@ for line in lines:
 print('\n')
 
 # Read input file for M1_first
-with open('M1_first.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M1_first.txt', 'r') as file:
     lines = file.readlines()
 
 values_first1 = []
@@ -74,7 +74,7 @@ for line in lines:
 print('\n\n')
 
 # Read input file for M2_ground
-with open('M2_ground.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M2_ground.txt', 'r') as file:
     lines = file.readlines()
 
 values_ground2 = []
@@ -88,7 +88,7 @@ for line in lines:
     errors_ground2.append(error_diff * w0_M2)
 print('\n')
 # Read input file for M2_first
-with open('M2_first.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M2_first.txt', 'r') as file:
     lines = file.readlines()
 
 values_first2 = []
@@ -102,7 +102,7 @@ for line in lines:
     errors_first2.append(error_diff * w0_M2)
 print('\n')
 # Read input file for M2_second
-with open('M2_second.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M2_second.txt', 'r') as file:
     lines = file.readlines()
 
 values_second2 = []
@@ -118,7 +118,7 @@ for line in lines:
 print('\n\n')
 
 # Read input file for M3_ground
-with open('M3_ground.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M3_ground.txt', 'r') as file:
     lines = file.readlines()
 
 values_ground3 = []
@@ -133,7 +133,7 @@ for line in lines:
 
 print('\n')
 # Read input file for M3_first
-with open('M3_first.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M3_first.txt', 'r') as file:
     lines = file.readlines()
 
 values_first3 = []
@@ -147,7 +147,7 @@ for line in lines:
     errors_first3.append(error_diff * w0_M3)
 print('\n')
 # Read input file for M3_second
-with open('M3_second.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M3_second.txt', 'r') as file:
     lines = file.readlines()
 
 values_second3 = []
@@ -162,7 +162,7 @@ for line in lines:
 
 
 # Read input file for M4_ground
-with open('M4_ground.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M4_ground.txt', 'r') as file:
     lines = file.readlines()
 
 values_ground4 = []
@@ -176,7 +176,7 @@ for line in lines:
     errors_ground4.append(error_diff * w0_M4)
 print('\n')
 # Read input file for M4_first
-with open('M4_first.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M4_first.txt', 'r') as file:
     lines = file.readlines()
 
 values_first4 = []
@@ -190,7 +190,7 @@ for line in lines:
     errors_first4.append(error_diff * w0_M4)
 print('\n')
 # Read input file for M4_second
-with open('M4_second.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M4_second.txt', 'r') as file:
     lines = file.readlines()
 
 values_second4 = []
@@ -208,7 +208,7 @@ print('\n\n')
 
 
 # Read input file for M5_ground
-with open('M5_ground.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M5_ground.txt', 'r') as file:
     lines = file.readlines()
 
 values_ground5 = []
@@ -222,7 +222,7 @@ for line in lines:
     errors_ground5.append(error_diff * w0_M5)
 print('\n')
 # Read input file for M5_first
-with open('M5_first.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M5_first.txt', 'r') as file:
     lines = file.readlines()
 
 values_first5 = []
@@ -236,7 +236,7 @@ for line in lines:
     errors_first5.append(error_diff * w0_M5)
 print('\n')
 # Read input file for M5_second
-with open('M5_second.txt', 'r') as file:
+with open('../../../input_fit/final_spectrum/M5_second.txt', 'r') as file:
     lines = file.readlines()
 
 values_second5 = []
