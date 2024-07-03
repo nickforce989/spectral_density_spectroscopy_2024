@@ -26,9 +26,9 @@ plt.figure(figsize=(4.5, 4))
 def calculate_mass_and_plot(ti, tf, x_min, x_max, y_min, y_max, Nsource, Nsink, noAPE = False):
     if noAPE == False:
         # Read data from file
-        data = np.loadtxt(f'eff_mass_N{Nsource}_N{Nsink}.txt')
+        data = np.loadtxt(f'../../../input_fit/Fig7/eff_mass_N{Nsource}_N{Nsink}.txt')
     else:
-        data = np.loadtxt(f'eff_mass_N{Nsource}_N{Nsink}_noAPE.txt')
+        data = np.loadtxt(f'../../../input_fit/Fig7/eff_mass_N{Nsource}_N{Nsink}_noAPE.txt')
     x = data[:, 0]
     y = data[:, 1]
     y_err = data[:, 2]
