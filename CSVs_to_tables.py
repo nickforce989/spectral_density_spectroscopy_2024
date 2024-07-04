@@ -267,3 +267,72 @@ for n in range(3):
         # Print confirmation message
         print("Tables generated and saved in output_table.tex")
 
+# Read the CSV file
+file_path = './CSVs/M1_spectral_density_spectrum.csv'
+df = pd.read_csv(file_path)
+
+# Extract the first nine rows and the specified columns
+df_subset = df.iloc[:9][['peaks', 'aE_0', 'aE_1']]
+
+# Define additional columns for the LaTeX table
+additional_columns = {
+    'Case': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+    'alpha_APE': [0.4] * 8 + [0.0],
+    'epsilon_f': [0.12] * 8 + [0.12],
+    'N_source': [80, 80, 80, 40, 20, 90, 170, 20, 80],
+    'N_sink': [20, 40, 80, 80, 80, 30, 170, 20, 40],
+    'A2_A1': ['1.32', '1.15', '0.75', '1.24', '1.80', '1.01', '0.63', '2.28', '1.27']
+}
+
+# Add the additional columns to the dataframe
+for col_name, col_data in additional_columns.items():
+    df_subset[col_name] = col_data
+
+metadata_file_path = './lsd_out/metadata/metadata_spectralDensity.csv'
+metadata_df = pd.read_csv(metadata_file_path, index_col=0)
+
+# Extract the required data using specific column names
+cf_columns = ['cw1', 'cw2', 'cw3', 'cw4', 'cf1', 'cf2', 'cf3', 'cf4', 'cf5']
+cf = metadata_df.loc['M1', cf_columns].values
+wc = metadata_df.loc['M2', cf_columns].values
+err1 = metadata_df.loc['M3', cf_columns].values
+err2 = metadata_df.loc['M4', cf_columns].values
+err3 = metadata_df.loc['M5', cf_columns].values
+
+print(cf)
+
+# Apply the conversion factors to aE_0 and aE_1 columns
+df_subset['aE_0'] = df_subset['aE_0'] * cf
+df_subset['aE_1'] = df_subset['aE_1'] * wc
+
+# Apply the add_error function to the specified columns
+df_subset['A2_A1'] = [add_error(float(val), err) for val, err in zip(df_subset['A2_A1'], err1)]
+df_subset['aE_0'] = [add_error(val, err) for val, err in zip(df_subset['aE_0'], err2)]
+df_subset['aE_1'] = [add_error(val, err) for val, err in zip(df_subset['aE_1'], err3)]
+
+# Reorder columns to match the desired LaTeX table
+df_subset = df_subset[['Case', 'alpha_APE', 'epsilon_f', 'N_source', 'N_sink', 'A2_A1', 'aE_0', 'aE_1']]
+
+# Generate LaTeX table manually
+latex_table = "\\begin{table}[b]\n\\begin{tabular}{ |c|c|c|c|c|c|c|c| }\n\\hline \\hline\n"
+latex_table += "Case & $\\alpha_\\textrm{APE}$ & $\\varepsilon_{\\rm f}$ & $N_{\\rm source}$ & $N_{\\rm sink}$ & $\\mathcal{A}_2/\\mathcal{A}_1$ & aE_0 & aE_1 \\\\\n\\hline\n"
+
+# Add rows to the table
+for index, row in df_subset.iterrows():
+    latex_table += "{} & {:.1f} & {:.2f} & {} & {} & {} & {} & {} \\\\\n".format(
+        row['Case'],
+        row['alpha_APE'],
+        row['epsilon_f'],
+        row['N_source'],
+        row['N_sink'],
+        row['A2_A1'],
+        row['aE_0'],
+        row['aE_1']
+    )
+
+# Close the table
+latex_table += "\\hline \\hline\n\\end{tabular}\n\\end{table}"
+
+with open(f'./tables/table3.tex', 'w') as file:
+    file.write(latex_table)
+
