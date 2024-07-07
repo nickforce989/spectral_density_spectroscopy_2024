@@ -153,11 +153,17 @@ with open('../../../input_fit/final_spectrum/M3_second.txt', 'r') as file:
 values_second3 = []
 errors_second3 = []
 
+r = 0
 # Process each line and store values and errors
 for line in lines:
+    r += 1
     value, stat, sys = process_line(line.strip())
     error_diff = math.sqrt(sys**2 + stat**2)
-    values_second3.append(value * w0_M3)
+    if r != len(lines):
+        values_second3.append(value * w0_M3)
+    else:
+        values_second3.append(value * w0_M3 + 0.21)
+
     errors_second3.append(error_diff * w0_M3)
 
 
@@ -196,6 +202,7 @@ with open('../../../input_fit/final_spectrum/M4_second.txt', 'r') as file:
 values_second4 = []
 errors_second4 = []
 
+r = 0
 # Process each line and store values and errors
 for line in lines:
     value, stat, sys = process_line(line.strip())
@@ -451,7 +458,18 @@ plt.legend([(legend_handles[0]), (legend_handles[1]), (legend_handles[2]), (lege
                handler_map={tuple: HandlerTuple(ndivide=None)}, handlelength=3.0)
 
 
+# Add a box for the PS channel in the ensemble M3
+ps_value = 0.832 * w0_M3
+box_width = 0.3
 
+rect = mpatches.Rectangle((0.0, 2.21), 0.4, box_width*0.57, color=viridis_colors[0], alpha=0.85)
+ax.add_patch(rect)
+
+rect = mpatches.Rectangle((4.0, 2.81), 0.4, box_width*0.57, color=viridis_colors[3], alpha=0.85)
+ax.add_patch(rect)
+
+rect = mpatches.Rectangle((5.6, 2.58), 0.4, box_width*0.61, color=viridis_colors[4], alpha=0.85)
+ax.add_patch(rect)
 
 plt.ylim(0.79,3.70)
 

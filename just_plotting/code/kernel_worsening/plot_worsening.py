@@ -10,24 +10,24 @@ plt.style.use("paperdraft.mplstyle")
 
 # Assuming you have the necessary data in Kernel1.txt and Kernel2.txt
 # Load data from files
-data_kernel1 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.4211936842105263.txt')
-data_kernel2 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.6274926315789473.txt')
-data_kernel3 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.782216842105263.txt')
+data_kernel1 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.406.txt')
+data_kernel2 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.5684.txt')
+data_kernel3 = np.loadtxt('../../../input_fit/kernel_worsening/kernel_0.7714.txt')
 
 # Extract energies and y-values from the data
 energies = np.linspace(0.1 * 0.4083, 3.0 * 0.4083, len(data_kernel1))
-x_to_plot_kernel1 = data_kernel1[:, 0]
-y_to_plot_kernel1 = data_kernel1[:, 1]
-x_to_plot_kernel2 = data_kernel2[:, 0]
-y_to_plot_kernel2 = data_kernel2[:, 1]
-x_to_plot_kernel3 = data_kernel3[:, 0]
-y_to_plot_kernel3 = data_kernel3[:, 1]
+x_to_plot_kernel1 = data_kernel1[:40, 0]
+y_to_plot_kernel1 = data_kernel1[:40, 1]
+x_to_plot_kernel2 = data_kernel2[:40, 0]
+y_to_plot_kernel2 = data_kernel2[:40, 1]
+x_to_plot_kernel3 = data_kernel3[:40, 0]
+y_to_plot_kernel3 = data_kernel3[:40, 1]
 
 # Other parameters
-massNorm = 0.4083
-omega =  0.4211936842105263
-omega2 =  0.6274926315789473
-omega3 =  0.782216842105263
+massNorm = 0.4123
+omega =  0.406
+omega2 =  0.5684
+omega3 =  0.7714
 
 def halfnorm_fp(e, s):  # int_0^inf dE exp{(-e-e0)^2/2s^2}
     res_ = math.erf(e / (np.sqrt(2) * s))
@@ -52,9 +52,9 @@ def gauss_fp(x, x0, sigma, norm="Full"):
 fig, axs = plt.subplots(3, 1, figsize=(6.9, 5.5))
 
 # Plot the y_to_plot curves
-y_to_plot1 = gauss_fp(energies, omega, 0.28*massNorm, norm="half")
-y_to_plot2 = gauss_fp(energies, omega2, 0.28*massNorm, norm="half")
-y_to_plot3 = gauss_fp(energies, omega3, 0.28*massNorm, norm="half")
+y_to_plot1 = gauss_fp(energies, omega, 0.42*massNorm, norm="half")
+y_to_plot2 = gauss_fp(energies, omega2, 0.42*massNorm, norm="half")
+y_to_plot3 = gauss_fp(energies, omega3, 0.42*massNorm, norm="half")
 
 
 axs[0].plot(

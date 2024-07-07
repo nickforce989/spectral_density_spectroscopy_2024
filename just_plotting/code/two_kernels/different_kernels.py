@@ -18,15 +18,15 @@ data_kernel1 = np.loadtxt('../../../input_fit/two_kernels/gauss_kernel_0.2285857
 data_kernel2 = np.loadtxt('../../../input_fit/two_kernels/cauchy_kernel_0.2285857894736842.txt')
 
 # Extract energies and y-values from the data
-energies = np.linspace(0.05 * 0.4054, 2.65 * 0.4054 - 0.07, len(data_kernel1)*10)
-x_to_plot_kernel1 =data_kernel1[:, 0]
-y_to_plot_kernel1 = data_kernel1[:, 1]
-x_to_plot_kernel2 =data_kernel2[:, 0]
-y_to_plot_kernel2 = data_kernel2[:, 1]
+energies = np.linspace(0.05 * 0.4054, 2.55 * 0.4054 - 0.07, len(data_kernel1)*10)
+x_to_plot_kernel1 =data_kernel1[:40-7, 0]
+y_to_plot_kernel1 = data_kernel1[:40-7, 1]
+x_to_plot_kernel2 =data_kernel2[:40-7, 0]
+y_to_plot_kernel2 = data_kernel2[:40-7, 1]
 
 # Other parameters
 
-massNorm = 0.4054
+massNorm = 0.3864
 omega =  0.2285857894736842
 
 def cauchy(x, mu1, sigma):
@@ -103,7 +103,7 @@ plt.plot(
             linewidth=1.8,
         )
 
-
+plt.xlim(-0.08, 2.63)
 # Add legend and labels
 plt.legend(fontsize=12,frameon=False)
 plt.grid(linestyle='--')

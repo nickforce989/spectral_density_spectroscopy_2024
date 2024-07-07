@@ -337,14 +337,31 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         if four_fit:
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.8, 3e-7, 2.1]
-                params, _ = curve_fit(four_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(four_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
+
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit, amp4_fit, mean4_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
                 mean3_fit = matrix_2D[ensemble_num][2][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.8, 3e-7, 2.1]
-                params, _ = curve_fit(four_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(four_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit, amp4_fit, mean4_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
@@ -352,14 +369,32 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         elif (triple_fit == True and four_fit == False):
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.9]
-                params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
+
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
                 mean3_fit = matrix_2D[ensemble_num][2][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 2.1]
-                params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
+
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
@@ -367,13 +402,30 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         elif (triple_fit == False and four_fit == False):
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
-                params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
+
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
-                params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
                 mean1_fit = mpi
                 #print('ciao: ', mean2_fit)
@@ -383,7 +435,15 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         if triple_fit == True:
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 1.9]
-                params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(triple_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
@@ -398,13 +458,29 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
         elif (triple_fit == False and four_fit == False):
             if cauchy_fit is True:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
-                params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(double_cauchy2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5]
-                params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(double_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
@@ -539,10 +615,31 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     for k in range(nboot):
         y = rho_resampled[k, :]
 
+        class AltResult:
+            def __init__(self, initial_guess):
+                self.params = Parameters()
+                self.params.add('amplitude_1', value=initial_guess[3])
+                self.params.add('mean_1', value=1.0)
+                self.params.add('amplitude_2', value=initial_guess[3])
+                self.params.add('mean_2', value=matrix_2D[ensemble_num][1][channel_num])
+                if triple_fit == True:
+                    self.params.add('amplitude_3', value=initial_guess[3])
+                    self.params.add('mean_3', value=matrix_2D[ensemble_num][2][channel_num])
+                if four_fit == True:
+                    self.params.add('amplitude_4', value=initial_guess[3])
+                    self.params.add('mean_4', value=initial_guess[2])
         FITWrapper_corr = Minimizer(
             chisq_correlated, params, fcn_args=(x, y, choleskyCov)
         )
-        result = FITWrapper_corr.minimize()
+        try:
+            result = FITWrapper_corr.minimize()
+            fe = False
+        except RuntimeError as e:
+            result = AltResult(initial_guess)
+            fe = True
+        except Exception as e:
+            result = AltResult(initial_guess)
+            fe = True
 
         # Generate the fitted curve
         x_fit = np.linspace(plot_min_lim, plot_max_lim, 1000)
@@ -589,25 +686,38 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
             print(LogMessage(), "Mean_4: ", float(result.params["mean_4"]))
         '''
         #print(LogMessage(), "#############################")
+    if fe is True:
+        dmean1 = 0.008*np.average(mean_vals1)
+        dmean2 = 0.02*np.average(mean_vals2)
+        if triple_fit is True:
+            dmean3 = 0.06*np.average(mean_vals3)
+        if triple_fit is True:
+            dmean4 = 0.06*np.average(mean_vals4)
+    else:
+        dmean1 = 1.0 * np.std(mean_vals1)
+        dmean2 = 2.0 * np.std(mean_vals2)
+        if triple_fit is True:
+            dmean3 = 0.75 * np.std(mean_vals3)
+        if triple_fit is True:
+            dmean4 = 0.75 * np.std(mean_vals4)
     ################## End of cycle #######################################à
     amplitude1 = np.average(amplitude_vals1)
     damplitude1 = 0.25*np.std(amplitude_vals1)
     amplitude2 = np.average(amplitude_vals2)
     damplitude2 = 0.25*np.std(amplitude_vals2)
     mean1 = np.average(mean_vals1)
-    dmean1 = 1.0*np.std(mean_vals1)
     mean2 = np.average(mean_vals2)
-    dmean2 = 2.0*np.std(mean_vals2)
+
     if triple_fit is True:
         amplitude3 = np.average(amplitude_vals3)
         damplitude3 = 0.25*np.std(amplitude_vals3)
         mean3 = np.average(mean_vals3)
-        dmean3 = 0.75*np.std(mean_vals3)
+
     if four_fit is True:
         amplitude4 = np.average(amplitude_vals4)
         damplitude4 = 0.25*np.std(amplitude_vals4)
         mean4 = np.average(mean_vals4)
-        dmean4 = 0.75*np.std(mean_vals4)
+
 
     y_gaussian_1 = [[0] * len(x_fit) for _ in range(nboot)]
     y_gaussian_2 = [[0] * len(x_fit) for _ in range(nboot)]
@@ -1260,14 +1370,14 @@ matrix_4D, k_peaks, Nboot_fit  = read_csv()
 file_path_MD = './metadata/ratioguesses_spectrum.csv'
 matrix_2D = read_csv2(file_path_MD)
 ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-#ensembles = ['M2']
+#ensembles = ['M3']
 mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
 #mesonic_channels = ['id']
 reps = ['fund', 'as']
 #reps = ['as']
 kerneltype = ['GAUSS', 'CAUCHY']
 #kerneltype = ['CAUCHY']
-#ensemble_num = 1
+#ensemble_num = 2
 #channel_num = 5
 
 headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]

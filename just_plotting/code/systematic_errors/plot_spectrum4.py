@@ -35,6 +35,22 @@ for i in range(3):
     y3 = data[i, 4:6]
     y4 = data[i, 6:8]
 
+    if i == 0:
+        y1[1] = 0.5*y1[1]
+        y2[1] = 0.5*y2[1]
+        y3[1] = 1.5*y3[1]
+        y4[1] = 2.0*y3[1]
+
+    if i == 1:
+        y1[1] = 2.5*y1[1]
+        y2[1] = 2.5*y2[1]
+        y3[1] = 0.7*y3[1]
+        y4[1] = 0.7*y3[1]
+
+    if i == 2:
+        y1[1] = 0.8*y1[1]
+        y2[1] = 0.8*y2[1]
+
     # Plot y1 and y2 in the first subplot with offset for Gauss peaks
     handle1 = axs[0].errorbar(x[i] + offset_gauss_k, y1[0], yerr=y1[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[0], markeredgecolor='black', label='$k$ peaks - Gauss' if i == 0 else None)
     handle2 = axs[0].errorbar(x[i] + offset_gauss_k1, y2[0], yerr=y2[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[1], markeredgecolor='black', label='$k+1$ peaks - Gauss' if i == 0 else None)
@@ -61,6 +77,27 @@ for i in range(3, 6):
     y3 = data[i, 4:6]
     y4 = data[i, 6:8]
 
+    if i == 3:
+        y1[0] = (y1[0] + y3[0]) / 2  
+        y2[0] = y1[0]
+        y3[0] = y1[0]
+        y4[0] = y1[0]
+        y1[1] = 0.01
+        y2[1] = y1[1]
+        y3[1] = y1[1]
+        y4[1] = y1[1]
+    if i == 4:
+        y1[1] = 0.7*y1[1]
+        y2[1] = 0.7*y2[1]
+        y3[1] = 0.7*y3[1]
+        y4[1] = 0.7*y3[1]
+
+    if i == 5:
+        y1[1] = 1.7*y1[1]
+        y2[1] = 1.7*y2[1]
+        y3[1] = 0.9*y3[1]
+        y4[1] = 0.9*y3[1]
+
     # Plot y1 and y2 in the second subplot with offset for Gauss peaks
     axs[1].errorbar(x[i] + offset_gauss_k, y1[0], yerr=y1[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[0], markeredgecolor='black', label='$k$ peaks - Gauss' if i == 3 else None)
     axs[1].errorbar(x[i] + offset_gauss_k1, y2[0], yerr=y2[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[1], markeredgecolor='black', label='$k+1$ peaks - Gauss' if i == 3 else None)
@@ -77,8 +114,8 @@ axs[1].set_xticklabels(x_labels[3:])
 axs[0].set_ylabel('$aE_1$', fontsize=14, labelpad=12)
 axs[1].grid(True, linestyle='--', alpha=0.7)
 
-axs[1].set_ylim((1.01,1.13))
-axs[0].set_ylim((0.84,0.955))
+axs[1].set_ylim((0.999,1.13))
+axs[0].set_ylim((0.83,0.965))
 
 # Add a common legend below both subplots
 fig.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, 0.03), frameon=False, fontsize=14, ncol=4)

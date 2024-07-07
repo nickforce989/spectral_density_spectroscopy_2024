@@ -25,10 +25,10 @@ def plot_stability_multiple_alpha(log_files, save_plot=True, n_alphas=2):
             capsize=3,
             ls="",
             label=r"$\alpha = {:1.2f}$".format(alpha_values[i]),
-            color=CB_colors[i],
+            color=CB_colors[2-i],
         )
 
-        if i == 0:
+        if i == 2:
             ax[1].errorbar(
                 x=data[:, 3],
                 y=data[:, 1],
@@ -40,7 +40,7 @@ def plot_stability_multiple_alpha(log_files, save_plot=True, n_alphas=2):
                 capsize=3,
                 ls="",
                 label=r"$\alpha = {:1.2f}$".format(alpha_values[i]),
-                color=CB_colors[i],
+                color=CB_colors[2-i],
             )
 
             # Add color block for the sixth smallest lambda value

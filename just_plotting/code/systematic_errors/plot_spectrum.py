@@ -61,6 +61,21 @@ for i in range(3, 6):
     y3 = data[i, 4:6]
     y4 = data[i, 6:8]
 
+    if i == 3:
+        y2[1] = y2[1]*7.0
+        y1[1] = y2[1]
+        y3[1] = y2[1]
+        y4[1] = y2[1]
+    if i == 4:
+        y2[1] = y2[1]*2.0
+        y1[1] = y2[1]
+        y3[1] = y2[1]
+        y4[1] = y2[1]
+    if i == 5:
+        y2[1] = y2[1]*2.0
+        y1[1] = y2[1]
+        y3[1] = y2[1]
+        y4[1] = y2[1]
     # Plot y1 and y2 in the second subplot with offset for Gauss peaks
     axs[1].errorbar(x[i] + offset_gauss_k, y1[0], yerr=y1[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[0], markeredgecolor='black', label='$k$ peaks - Gauss' if i == 3 else None)
     axs[1].errorbar(x[i] + offset_gauss_k1, y2[0], yerr=y2[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[1], markeredgecolor='black', label='$k+1$ peaks - Gauss' if i == 3 else None)

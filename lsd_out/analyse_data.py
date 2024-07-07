@@ -21,6 +21,8 @@ import numpy as np
 from lsdensities.InverseProblemWrapper import AlgorithmParameters, InverseProblemWrapper
 from lsdensities.utils.rhoUtils import MatrixBundle
 import random
+import shutil
+
 def main():
     def get_directory_size(directory):
         total_size = 0
@@ -53,7 +55,7 @@ def main():
         in_.Na = Na
         in_.A0cut = A0cut
         return in_
-    def findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi):
+    def findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams):
         print(LogMessage(), "Initialising")
         #args = parseArgumentRhoFromData()
         init_precision(prec)
@@ -114,20 +116,10 @@ def main():
 
         #   Prepare
         cNorm = mpf(str(corr.central[1] ** 2))
-        lambdaMax = 1e4
+
         energies = np.linspace(par.emin, par.emax, par.Ne)
 
-        hltParams = AlgorithmParameters(
-            alphaA=0,
-            alphaB=1 / 2,
-            alphaC=+1.99,
-            lambdaMax=lambdaMax,
-            lambdaStep=lambdaMax / 2,
-            lambdaScanCap=8,
-            kfactor=0.1,
-            lambdaMin=5e-2,
-            comparisonRatio=0.3,
-        )
+
         matrix_bundle = MatrixBundle(Bmatrix=corr.mpcov, bnorm=cNorm)
 
         HLT = InverseProblemWrapper(
@@ -146,7 +138,7 @@ def main():
             generateKernelsPlot=True,
         )  # Lots of plots as it is
         HLT.plotResult()
-        end()
+        #end()
 
     ####################### External data for make rho finding easier #######################
     categories = ['PS', 'V', 'T', 'AV', 'AT', 'S', 'ps', 'v', 't', 'av', 'at', 's']
@@ -267,19 +259,33 @@ def main():
                 print(f"The subdirectory '{outdir}' exists and its size is at least 12 MB.")
             else:
                 print(f"The subdirectory '{outdir}' does not exist or its size is less than 12 MB.")
-                findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi)
+                findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
         else:
             print(f"The subdirectory '{outdir}' does not exist or its size is less than 12 MB.")
             directory_size = get_directory_size(subdirectory_path)
             size_in_megabytes = directory_size / (1024 * 1024)  # Convert bytes to megabytes
             print(f"Size of the subdirectory '{outdir}': {size_in_megabytes:.2f} MB")
-            findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi)
+            findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
 
 
 
     ################# Download and use lsdensities on correlators ########################
     # Replace 'your_file.h5' with the path to your HDF5 file
     file_path = '../input_correlators/chimera_data_full.hdf5'
+    '''
+    lambdaMax = 1e4
+
+    hltParams = AlgorithmParameters(
+        alphaA=0,
+        alphaB=1 / 2,
+        alphaC=+1.99,
+        lambdaMax=lambdaMax,
+        lambdaStep=lambdaMax / 2,
+        lambdaScanCap=8,
+        kfactor=0.1,
+        lambdaMin=5e-2,
+        comparisonRatio=0.3,
+    )
     for kernel in kerneltype:
         processes = []
         for index, ensemble in enumerate(ensembles):
@@ -291,6 +297,365 @@ def main():
                     process.start()
         for process in processes:
             process.join()
+    
+    # Consider M1 for vector meson fundamental
+    mpi = matrix_4D[0][1][1]
+    channel = 'gi'
+    rep = 'fund'
+    kernel = 'HALFNORMGAUSS'
+    ensemble = 'M1'
+    tmp = mpi * 0.30
+    sigma = tmp
+    decimal_part = tmp / mpi % 1
+    decimal_as_int = int(decimal_part * 100)
+    Nsource = 80
+    Nsink = 40
+    datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
+    outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
+    ne = 1
+    emin = 1.25
+    emax = 1.25
+    periodicity = 'COSH'
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 3
+    A0cut = 0.1
 
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+
+    tmax = 24
+
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+
+    # Define the log files to copy
+    log_files = [
+        'InverseProblemLOG_AlphaA.log',
+        'InverseProblemLOG_AlphaB.log',
+        'InverseProblemLOG_AlphaC.log'
+    ]
+
+    # Define the destination directory
+    destination_dir = '../input_fit/stability_plot'
+
+    # Ensure the destination directory exists
+    os.makedirs(destination_dir, exist_ok=True)
+
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, log_file)
+        if os.path.exists(src_file):
+            shutil.copy(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+    
+    # Consider M2 for vector meson fundamental
+    energy = 0.2285857894736842
+    mpi = 0.2285857894736842 / 0.60
+    channel = 'gi'
+    rep = 'fund'
+    kernel = 'HALFNORMGAUSS'
+    ensemble = 'M2'
+    tmp = mpi * 0.40
+    sigma = tmp
+    decimal_part = tmp / mpi % 1
+    decimal_as_int = int(decimal_part * 100)
+    Nsource = 80
+    Nsink = 40
+    datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
+    outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
+    ne = 1
+    emin = 0.60
+    emax = 0.60
+    periodicity = 'COSH'
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 1
+    A0cut = 0.1
+
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+
+    tmax = 32
+
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+
+    # Define the log files to copy
+    log_files = [
+        f'kernel_{energy}.txt'
+    ]
+
+    # Define the destination directory
+    destination_dir = '../input_fit/two_kernels'
+
+    # Ensure the destination directory exists
+    os.makedirs(destination_dir, exist_ok=True)
+
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, 'gauss_' + log_file)
+        if os.path.exists(src_file):
+            shutil.copy(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+    
+    kernel = 'CAUCHY'
+    outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, 'cauchy_' + log_file)
+        if os.path.exists(src_file):
+            shutil.copy(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+    '''
+    '''
+    # Consider M2 for vector meson fundamental
+    mpi = matrix_4D[1][1][1]
+    channel = 'gi'
+    rep = 'fund'
+    kernel = 'HALFNORMGAUSS'
+    ensemble = 'M2'
+    tmp = mpi * 0.42
+    sigma = tmp
+    decimal_part = tmp / mpi % 1
+    decimal_as_int = int(decimal_part * 100)
+    Nsource = 80
+    Nsink = 40
+    datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
+    outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
+    ne = 10
+    emin = 1.0
+    emax = 1.9
+    periodicity = 'COSH'
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 10
+    A0cut = 0.1
+
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+
+    tmax = 32
+    omega = 0.406
+    omega2 = 0.5684
+    omega3 = 0.7714
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+    log_files = [
+        f'kernel_{omega}.txt',
+        f'kernel_{omega2}.txt',
+        f'kernel_{omega3}.txt'
+    ]
+    
+    # Define the destination directory
+    destination_dir = '../input_fit/kernel_worsening'
+    # Ensure directories exist
+    os.makedirs(destination_dir, exist_ok=True)
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, log_file)
+        if os.path.exists(src_file):
+            shutil.copy(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+
+
+    # Consider M1 for vector meson fundamental
+    lambdaMax = 10
+
+    hltParams = AlgorithmParameters(
+        alphaA=0,
+        alphaB=1 / 2,
+        alphaC=+1.99,
+        lambdaMax=lambdaMax,
+        lambdaStep=lambdaMax / 2,
+        lambdaScanCap=8,
+        kfactor=0.1,
+        lambdaMin=5e-2,
+        comparisonRatio=0.3,
+    )
+    mpi = matrix_4D[0][1][1]
+    channel = 'gi'
+    rep = 'fund'
+    kernel = 'HALFNORMGAUSS'
+    ensemble = 'M1'
+    tmp = mpi * 0.36
+    sigma = tmp
+    decimal_part = tmp / mpi % 1
+    decimal_as_int = int(decimal_part * 100)
+    Nsource = 80
+    Nsink = 40
+    datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
+    outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
+    ne = 1
+    emin = 1.8
+    emax = 1.8
+    periodicity = 'COSH'
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 1
+    A0cut = 0.1
+
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+
+    tmax = 24
+
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+    log_files = [
+        f'kernel_0.738.txt',
+    ]
+
+    # Define the destination directory
+    destination_dir = '../input_fit/kernel_comparisons_nt'
+    # Ensure directories exist
+    os.makedirs(destination_dir, exist_ok=True)
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, 'Kernel1.txt')
+        if os.path.exists(src_file):
+            shutil.copy(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+
+        # Consider M2 for vector meson fundamental
+        lambdaMax = 0.01
+
+        hltParams = AlgorithmParameters(
+            alphaA=0,
+            alphaB=1 / 2,
+            alphaC=+1.99,
+            lambdaMax=lambdaMax,
+            lambdaStep=lambdaMax / 2,
+            lambdaScanCap=8,
+            kfactor=0.1,
+            lambdaMin=5e-4,
+            comparisonRatio=0.3,
+        )
+        mpi = matrix_4D[1][1][1]
+        print('mpi: ', mpi)
+        channel = 'gi'
+        rep = 'fund'
+        kernel = 'HALFNORMGAUSS'
+        ensemble = 'M2'
+        tmp = mpi * 0.36
+        sigma = tmp
+        decimal_part = tmp / mpi % 1
+        decimal_as_int = int(decimal_part * 100)
+        Nsource = 80
+        Nsink = 40
+        datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
+        outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
+        ne = 1
+        emin = 1.8
+        emax = 1.8
+        periodicity = 'COSH'
+        prec = 105
+        nboot = 300
+        e0 = 0.0
+        Na = 1
+        A0cut = 0.1
+
+        findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi,
+                hltParams)
+
+        tmax = 32
+
+        outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+        log_files = [
+            f'kernel_0.7308000000000001.txt',
+        ]
+
+        # Define the destination directory
+        destination_dir = '../input_fit/kernel_comparisons_nt'
+        # Ensure directories exist
+        os.makedirs(destination_dir, exist_ok=True)
+        # Copy each log file from outdir to the destination directory
+        for log_file in log_files:
+            src_file = os.path.join(outdir2, log_file)
+            dest_file = os.path.join(destination_dir, 'Kernel2.txt')
+            if os.path.exists(src_file):
+                shutil.copy(src_file, dest_file)
+                print(f"Copied {src_file} to {dest_file}")
+            else:
+                print(f"File {src_file} does not exist and cannot be copied")
+
+
+    # Consider M3 for vector meson fundamental
+    lambdaMax = 0.0001
+
+    hltParams = AlgorithmParameters(
+        alphaA=0,
+        alphaB=1 / 2,
+        alphaC=+1.99,
+        lambdaMax=lambdaMax,
+        lambdaStep=lambdaMax / 2,
+        lambdaScanCap=8,
+        kfactor=0.1,
+        lambdaMin=5e-6,
+        comparisonRatio=0.3,
+    )
+    mpi = matrix_4D[2][1][1]
+    channel = 'gi'
+    rep = 'fund'
+    kernel = 'HALFNORMGAUSS'
+    ensemble = 'M3'
+    tmp = mpi * 0.36
+    sigma = tmp
+    decimal_part = tmp / mpi % 1
+    decimal_as_int = int(decimal_part * 100)
+    Nsource = 80
+    Nsink = 40
+    datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}.txt'
+    outdir = f'./{ensemble}_{rep}_{channel}_s0p{decimal_as_int}_{kernel}_Nsource{Nsource}_Nsink{Nsink}'
+    ne = 1
+    emin = 1.8
+    emax = 1.8
+    periodicity = 'COSH'
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 1
+    A0cut = 0.1
+
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+
+    tmax = 48
+    
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+    log_files = [
+        f'kernel_0.7362.txt',
+    ]
+
+    # Define the destination directory
+    destination_dir = '../input_fit/kernel_comparisons_nt'
+    # Ensure directories exist
+    os.makedirs(destination_dir, exist_ok=True)
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, 'Kernel3.txt')
+        if os.path.exists(src_file):
+            shutil.copy(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+    '''
+
+
+    
 if __name__ == "__main__":
     main()

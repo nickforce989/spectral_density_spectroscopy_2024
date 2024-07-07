@@ -16,10 +16,10 @@ data_kernel2 = np.loadtxt('../../../input_fit/kernel_comparisons_nt/Kernel2.txt'
 data_kernel3 = np.loadtxt('../../../input_fit/kernel_comparisons_nt/Kernel3.txt')
 
 # Extract energies and y-values from the data
-energies = np.linspace(0.05 * 0.4054, 4.0 * 0.4054, len(data_kernel1))
-y_to_plot_kernel1 = data_kernel1[:, 1]
-y_to_plot_kernel2 = data_kernel2[:, 1]
-y_to_plot_kernel3 = data_kernel3[:, 1]
+energies = np.linspace(0.05 * 0.4054, 3.0 * 0.4054, 40)
+y_to_plot_kernel1 = data_kernel1[:40, 1]
+y_to_plot_kernel2 = data_kernel2[:40, 1]
+y_to_plot_kernel3 = data_kernel3[:40, 1]
 
 # Other parameters
 

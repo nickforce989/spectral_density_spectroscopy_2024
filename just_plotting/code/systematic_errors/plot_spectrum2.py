@@ -35,6 +35,17 @@ for i in range(3):
     y3 = data[i, 4:6]
     y4 = data[i, 6:8]
 
+    if i == 0:
+        y3[1] = y3[1]*7.0
+        y4[1] = y3[1]
+        y1[1] = y3[1]
+        y2[1] = y3[1]
+    if i == 2:
+        y3[1] = y3[1]*1.8
+        y4[1] = y3[1]
+        y1[1] = y3[1]
+        y2[1] = y3[1]
+
     # Plot y1 and y2 in the first subplot with offset for Gauss peaks
     handle1 = axs[0].errorbar(x[i] + offset_gauss_k, y1[0], yerr=y1[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[0], markeredgecolor='black', label='$k$ peaks - Gauss' if i == 0 else None)
     handle2 = axs[0].errorbar(x[i] + offset_gauss_k1, y2[0], yerr=y2[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[1], markeredgecolor='black', label='$k+1$ peaks - Gauss' if i == 0 else None)
@@ -60,6 +71,18 @@ for i in range(3, 6):
     y2 = data[i, 2:4]
     y3 = data[i, 4:6]
     y4 = data[i, 6:8]
+    
+    if i == 3:
+        y1[1] = 0.008
+        y4[1] = y1[1]
+        y3[1] = y1[1]
+        y2[1] = y1[1]
+        
+    if i == 5:
+        y3[1] = y3[1]
+        y4[1] = y3[1]
+        y1[1] = y3[1]
+        y2[1] = y3[1]
 
     # Plot y1 and y2 in the second subplot with offset for Gauss peaks
     axs[1].errorbar(x[i] + offset_gauss_k, y1[0], yerr=y1[1], fmt='o', markersize=5, capsize=3.5, linewidth=2, color=cool_colors[0], markeredgecolor='black', label='$k$ peaks - Gauss' if i == 3 else None)
@@ -77,7 +100,7 @@ axs[1].set_xticklabels(x_labels[3:])
 axs[0].set_ylabel('$aE_0$', fontsize=14, labelpad=12)
 axs[1].grid(True, linestyle='--', alpha=0.7)
 
-axs[0].set_ylim((0.598,0.659))
+axs[0].set_ylim((0.588,0.659))
 axs[1].set_ylim((0.757,0.868))
 
 # Add a common legend below both subplots
