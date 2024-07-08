@@ -452,7 +452,9 @@ for i, hatch in enumerate(hatches):
 plt.legend([(legend_handles[0]), (legend_handles[1]), (legend_handles[2]), (legend_handles[3]), (legend_handles[4])], ['M1', 'M2', 'M3', 'M4', 'M5'],
               handler_map={tuple: HandlerTuple(ndivide=None)}, handlelength=3.0, loc='upper left', bbox_to_anchor=(1, 1))
 
-
+box_width = 0.3
+rect = mpatches.Rectangle((-0.08, 2.11), 0.38, box_width*0.57, color=viridis_colors[0], alpha=0.85)
+ax.add_patch(rect)
 
 
 plt.ylim(0.79,2.40)
