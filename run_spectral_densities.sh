@@ -31,9 +31,11 @@ if [ "$all_subdirs_present" = false ]; then
     if [ "$inner_condition_met" = false ]; then
         python analyse_data.py
         python print_samples.py
+        python post_analysis_spdens.py
         python fit_data.py
     else
         python print_samples.py
+        python post_analysis_spdens.py
         python fit_data.py
     fi
 

@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-'''
+
 # Load the CSV file
 file_path = './CSVs/M2_spectral_density_spectrum.csv'
 df = pd.read_csv(file_path)
@@ -107,7 +107,7 @@ with open(output_file_path, 'w') as f:
     f.write(output_aE_0 + '\n' + output_aE_1)
 
 print(f"Results have been written to {output_file_path}")
-'''
+
 
 import pandas as pd
 
