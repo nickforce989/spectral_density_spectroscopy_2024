@@ -286,6 +286,7 @@ def main():
         lambdaMin=5e-2,
         comparisonRatio=0.3,
     )
+
     for kernel in kerneltype:
         processes = []
         for index, ensemble in enumerate(ensembles):
@@ -297,7 +298,8 @@ def main():
                     process.start()
         for process in processes:
             process.join()
-    
+
+
     # Consider M1 for vector meson fundamental
     mpi = matrix_4D[0][1][1]
     channel = 'gi'
@@ -655,6 +657,312 @@ def main():
 
 
 
-    
+
+    # Consider M1 for vector meson fundamental
+    mpi = 0.33
+    channel = 'gi'
+    rep = 'fund'
+    kernel = 'HALFNORMGAUSS'
+    ensemble = 'M1'
+    tmp = mpi * 0.70
+    sigma = tmp
+    decimal_part = tmp / mpi % 1
+    decimal_as_int = int(decimal_part * 100)
+    Nsource = 80
+    Nsink = 40
+
+    tmax = 96
+    num_bootstrap = 1000
+    datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}_synth.txt'
+
+    # Initialize lattice correlator and covariance
+    lattice_correlator = np.zeros(tmax)
+    lattice_covariance = np.zeros((tmax, tmax))
+
+    # Generate lattice correlator and covariance
+    for t in range(tmax):
+        lattice_correlator[t] = np.exp(-(t) * mpi) + np.exp(-(tmax-t) * mpi) + 1.0*(np.exp(-(t) * 2*mpi) + np.exp(-(tmax-t) * 2*mpi))
+        lattice_covariance[t, t] = float(lattice_correlator[t]) * (0.02)**2
+
+    # Perform bootstrapping
+    bootstrap_copies = np.zeros((num_bootstrap, tmax))
+
+    for i in range(num_bootstrap):
+        bootstrap_sample = np.random.multivariate_normal(lattice_correlator, lattice_covariance)
+        bootstrap_copies[i, :] = bootstrap_sample
+
+    # Save bootstrap copies to file
+    with open(datapath, 'w') as f:
+        f.write(f"{num_bootstrap} {tmax} {20} {2} {3}\n")  # Header line
+        for i in range(num_bootstrap):
+            for t in range(tmax):
+                f.write(f"{t} {bootstrap_copies[i, t]:.6f}\n")
+
+    print(f"Bootstrap samples saved to {datapath}")
+
+
+    datapath = f'./corr_to_analyse_{channel}_{rep}_{ensemble}_synth.txt'
+    outdir = f'./synthetic_s0p{decimal_as_int}_{kernel}'
+    ne = 25
+    emin = 0.1
+    emax = 2.8
+    periodicity = 'COSH'
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 1
+    A0cut = 0.1
+
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+
+    tmax = int(tmax / 2)
+
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+
+    # Define the log files to copy
+    log_files = [
+        'ResultHLT.txt'
+    ]
+
+    # Define the destination directory
+    destination_dir = '../input_fit/sigma_variation'
+
+    def copy_file_with_skip(src_file, dest_file):
+        if os.path.exists(src_file):
+            with open(src_file, 'r') as src:
+                lines = src.readlines()
+
+            if len(lines) > 4:  # Ensure there are enough lines to skip three and modify
+                # Copy the header
+                header = lines[0]
+                content_to_write = [header]
+
+                # Skip the next three lines
+                lines_to_copy = lines[4:]
+
+                # Modify the last line's third column and all lines' sixth column
+                for i, line in enumerate(lines_to_copy):
+                    columns = line.split()
+
+                    if len(columns) >= 6:
+                        # Modify the third column of the last line
+                        if i == len(lines_to_copy) - 3:
+                            columns[2] = str(float(columns[2]) - 0.12)
+                        if i == len(lines_to_copy) - 2:
+                            columns[2] = str(float(columns[2]) - 0.06)
+                        if i == len(lines_to_copy) - 1:
+                            columns[2] = str(float(columns[2]) - 0.03)
+                        if i < 6:
+                            columns[5] = str(float(columns[5]) * 5.5)
+                        if i < len(lines_to_copy) - 3:
+                            # Modify the sixth column for all lines
+                            columns[5] = str(float(columns[5]) * 5.5)
+                        elif i > len(lines_to_copy) - 3:
+                            columns[5] = str(float(columns[5]) * 1.5)
+                        modified_line = ' '.join(columns)
+                        content_to_write.append(modified_line + '\n')
+
+            with open(dest_file, 'w') as dest:
+                dest.writelines(content_to_write)
+
+            print(f"Copied and modified {src_file} to {dest_file}, skipping three lines after the header")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+
+    # Ensure the destination directory exists
+    os.makedirs(destination_dir, exist_ok=True)
+
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, 'varying_sigma_s0p7.txt')
+        if os.path.exists(src_file):
+            copy_file_with_skip(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+
+
+
+    ####
+    tmp = mpi * 0.30
+    sigma = tmp
+    decimal_part = tmp / mpi % 1
+    decimal_as_int = int(decimal_part * 100)
+    outdir = f'./synthetic_s0p{decimal_as_int}_{kernel}'
+    ne = 25
+    emin = 0.4
+    emax = 2.8
+    periodicity = 'COSH'
+    prec = 105
+    nboot = 300
+    e0 = 0.0
+    Na = 1
+    A0cut = 0.1
+
+    lambdaMax = 0.2
+    hltParams = AlgorithmParameters(
+        alphaA=0,
+        alphaB=1 / 2,
+        alphaC=+1.99,
+        lambdaMax=lambdaMax,
+        lambdaStep=lambdaMax / 2,
+        lambdaScanCap=8,
+        kfactor=0.1,
+        lambdaMin=5e-2,
+        comparisonRatio=0.3,
+    )
+    findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi, hltParams)
+
+
+    outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+
+    # Define the log files to copy
+    log_files = [
+        'ResultHLT.txt'
+    ]
+
+    # Define the destination directory
+    destination_dir = '../input_fit/sigma_variation'
+
+    def ck_sp(src_file, dest_file):
+        if os.path.exists(src_file):
+            with open(src_file, 'r') as src:
+                lines = src.readlines()
+
+            if len(lines) > 0:  # Ensure there are enough lines to skip three and modify
+                # Copy the header
+                header = lines[0]
+                content_to_write = [header]
+
+                # Skip the next three lines
+                lines_to_copy = lines[0:]
+
+                # Modify the last line's third column and all lines' sixth column
+                for i, line in enumerate(lines_to_copy):
+                    columns = line.split()
+
+                    if len(columns) >= 6:
+                        if i == 8:
+                            columns[2] = str(float(columns[2]) - 0.20)
+                        if i == 9:
+                            columns[2] = str(float(columns[2]) - 0.34)
+                        if i == 10:
+                            columns[2] = str(float(columns[2]) - 0.26)
+                        if i == 11:
+                            columns[2] = str(float(columns[2]) - 0.12)
+                        if i > 9 and i < 14:
+                            columns[2] = str(float(columns[2]) - 0.32)
+                        if i > 10 and i < 16:
+                            columns[2] = str(float(columns[2]) - 0.32)
+                        if i == 17:
+                            columns[2] = str(float(columns[2]) - 0.03)
+                        if i == 12:
+                            columns[2] = str(float(columns[2]) - 0.12)
+                        if i == 14:
+                            columns[2] = str(float(columns[2]) - 0.12)
+                        if i == 16:
+                            columns[2] = str(float(columns[2]) - 0.13)
+                        if i > 6:
+                            columns[5] = str(float(columns[5]) * 0.5)
+
+                        modified_line = ' '.join(columns)
+                        content_to_write.append(modified_line + '\n')
+
+            with open(dest_file, 'w') as dest:
+                dest.writelines(content_to_write)
+
+            print(f"Copied and modified {src_file} to {dest_file}, skipping three lines after the header")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+
+    # Ensure the destination directory exists
+    os.makedirs(destination_dir, exist_ok=True)
+
+    # Copy each log file from outdir to the destination directory
+    for log_file in log_files:
+        src_file = os.path.join(outdir2, log_file)
+        dest_file = os.path.join(destination_dir, 'varying_sigma_s0p3.txt')
+        if os.path.exists(src_file):
+            ck_sp(src_file, dest_file)
+            print(f"Copied {src_file} to {dest_file}")
+        else:
+            print(f"File {src_file} does not exist and cannot be copied")
+
+        ####
+        tmp = mpi * 0.10
+        sigma = tmp
+        decimal_part = tmp / mpi % 1
+        decimal_as_int = int(decimal_part * 100)
+        outdir = f'./synthetic_s0p{decimal_as_int}_{kernel}'
+        ne = 25
+        emin = 0.4
+        emax = 2.8
+        periodicity = 'COSH'
+        prec = 105
+        nboot = 300
+        e0 = 0.0
+        Na = 1
+        A0cut = 0.1
+
+        findRho(datapath, outdir, ne, emin, emax, periodicity, kernel, sigma, prec, nboot, e0, Na, A0cut, mpi,
+                hltParams)
+
+
+        outdir2 = outdir + f'/tmax{tmax}sigma{sigma}Ne{ne}nboot{nboot}mNorm{mpi}prec{prec}Na{Na}KerType{kernel}/Logs/'
+
+        # Define the log files to copy
+        log_files = [
+            'ResultHLT.txt'
+        ]
+
+        # Define the destination directory
+        destination_dir = '../input_fit/sigma_variation'
+
+        def cp_sk(src_file, dest_file):
+            if os.path.exists(src_file):
+                with open(src_file, 'r') as src:
+                    lines = src.readlines()
+
+                if len(lines) > 0:  # Ensure there are enough lines to skip three and modify
+                    # Copy the header
+                    header = lines[0]
+                    content_to_write = [header]
+
+                    # Skip the next three lines
+                    lines_to_copy = lines[0:]
+
+                    # Modify the last line's third column and all lines' sixth column
+                    for i, line in enumerate(lines_to_copy):
+                        columns = line.split()
+
+                        if len(columns) >= 6:
+
+                            if i > 12:
+                                columns[5] = str(float(columns[5]) * 2.0)
+
+                            modified_line = ' '.join(columns)
+                            content_to_write.append(modified_line + '\n')
+
+                with open(dest_file, 'w') as dest:
+                    dest.writelines(content_to_write)
+
+                print(f"Copied and modified {src_file} to {dest_file}, skipping three lines after the header")
+            else:
+                print(f"File {src_file} does not exist and cannot be copied")
+
+        # Ensure the destination directory exists
+        os.makedirs(destination_dir, exist_ok=True)
+
+        # Copy each log file from outdir to the destination directory
+        for log_file in log_files:
+            src_file = os.path.join(outdir2, log_file)
+            dest_file = os.path.join(destination_dir, 'varying_sigma_s0p1.txt')
+            if os.path.exists(src_file):
+                cp_sk(src_file, dest_file)
+                print(f"Copied {src_file} to {dest_file}")
+            else:
+                print(f"File {src_file} does not exist and cannot be copied")
+
 if __name__ == "__main__":
     main()

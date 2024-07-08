@@ -23,17 +23,17 @@ mpi = 0.33
 # Extract columns for the first file
 x1 = data1[:, 0] / mpi
 y1 = data1[:, 2]
-y_error1 = data1[:, -1]
+y_error1 = data1[:, -2]
 
 # Extract columns for the second file
 x2 = data2[:, 0] / mpi
 y2 = data2[:, 2]
-y_error2 = data2[:, -1]
+y_error2 = data2[:, -2]
 
 # Extract columns for the third file
 x3 = data3[:, 0] / mpi
 y3 = data3[:, 2]
-y_error3 = data3[:, -1]
+y_error3 = data3[:, -2]
 
 # Calculate scaling factors based on the integrals
 integral1 = np.trapz(y1, x=x1)
