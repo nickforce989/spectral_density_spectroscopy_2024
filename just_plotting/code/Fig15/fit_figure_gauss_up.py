@@ -3,12 +3,10 @@ import matplotlib.pyplot as plt
 
 plt.style.use("paperdraft.mplstyle")
 plt.figure(figsize=(7, 4.5))
-# Load data from gauss_curves.txt
-gauss_data = np.loadtxt("../../../input_fit/Fig15/gauss_curves_up.txt")
 
 # Extracting mean, amplitude, and error values for each gaussian curve
-mean1, amplitude1, err_amplitude1 = gauss_data[0]
-mean2, amplitude2, err_amplitude2 = gauss_data[1]
+mean1, amplitude1, err_amplitude1 = 0.4098, 4.69e-7, 3.e-8 
+mean2, amplitude2, err_amplitude2 = 0.67, 4.7e-7, 6.3e-8
 
 mpi = 0.3685
 
