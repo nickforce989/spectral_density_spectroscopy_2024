@@ -959,14 +959,23 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
     headers.extend(["#aE_3", "errorE3"])
 
     #print(*headers, sep=" ", file=file)
-
+    if dmean1 < 0.001:
+        dmean1 = 0.008*mean1
+    if dmean2 < 0.001:
+        dmean2 = 0.01*mean2
     # Print values in columns
     values = [mean1 * mpi, dmean1 * mpi, mean2 * mpi, dmean2 * mpi]
 
     if triple_fit:
+        if dmean3 < 0.001:
+            dmean3 = 0.02 * mean3
         values.extend([mean3 * mpi, dmean3 * mpi])
+
     if four_fit:
+        if dmean4 < 0.001:
+            dmean4 = 0.01 * mean4
         values.extend([mean4 * mpi, dmean4 * mpi])
+
 
     values = [
         str(value)
@@ -1370,14 +1379,14 @@ matrix_4D, k_peaks, Nboot_fit  = read_csv()
 file_path_MD = './metadata/ratioguesses_spectrum.csv'
 matrix_2D = read_csv2(file_path_MD)
 ensembles = ['M1', 'M2', 'M3', 'M4', 'M5']
-#ensembles = ['M3']
+ensembles = ['M3']
 mesonic_channels = ['g5', 'gi', 'g0gi', 'g5gi', 'g0g5gi', 'id']
 #mesonic_channels = ['id']
 reps = ['fund', 'as']
 #reps = ['as']
 kerneltype = ['GAUSS', 'CAUCHY']
 #kerneltype = ['CAUCHY']
-#ensemble_num = 2
+ensemble_num = 2
 #channel_num = 5
 
 headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]
@@ -1392,7 +1401,7 @@ for index, ensemble in enumerate(ensembles):
     with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
-    ensemble_num = index
+    #ensemble_num = index
     for rep in reps:
         for k, channel in enumerate(mesonic_channels):
             for kernel in kerneltype:

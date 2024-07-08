@@ -272,7 +272,7 @@ def main():
     ################# Download and use lsdensities on correlators ########################
     # Replace 'your_file.h5' with the path to your HDF5 file
     file_path = '../input_correlators/chimera_data_full.hdf5'
-    '''
+
     lambdaMax = 1e4
 
     hltParams = AlgorithmParameters(
@@ -417,8 +417,7 @@ def main():
             print(f"Copied {src_file} to {dest_file}")
         else:
             print(f"File {src_file} does not exist and cannot be copied")
-    '''
-    '''
+
     # Consider M2 for vector meson fundamental
     mpi = matrix_4D[1][1][1]
     channel = 'gi'
@@ -653,7 +652,7 @@ def main():
             print(f"Copied {src_file} to {dest_file}")
         else:
             print(f"File {src_file} does not exist and cannot be copied")
-    '''
+
 
 
     
