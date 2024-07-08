@@ -40,6 +40,7 @@ if [ "$all_subdirs_present" = false ]; then
     fi
 
 else
+    python post_analysis_spdens.py
     python fit_data.py
 fi
 
