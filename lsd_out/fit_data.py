@@ -9,6 +9,7 @@ import csv
 from scipy.optimize import curve_fit
 import multiprocessing
 import csv
+import shutil
 
 # Plot x-limits
 plot_min_lim = 0.20
@@ -450,7 +451,15 @@ def perform_fit(kernel,ensemble,rep,channel, ensemble_num, channel_num,path, fil
                 mean3_fit = matrix_2D[ensemble_num][2][channel_num]
             else:
                 initial_guess = [4e-7, 1.0, 6e-7, 1.5, 4e-7, 2.1]
-                params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                try:
+                    params, _ = curve_fit(triple_gaussian2, x, rho_central, p0=initial_guess, sigma=drho_central)
+                except RuntimeError as e:
+                    print(f"Runtime error during fitting: {e}")
+                    # Optionally, you can set default parameters or handle the error differently
+                    params = initial_guess
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    params = initial_guess
                 amp1_fit, mean1_fit, amp2_fit, mean2_fit, amp3_fit, mean3_fit = params
                 mean1_fit = mpi
                 mean2_fit = matrix_2D[ensemble_num][1][channel_num]
@@ -1386,7 +1395,7 @@ reps = ['fund', 'as']
 #reps = ['as']
 kerneltype = ['GAUSS', 'CAUCHY']
 #kerneltype = ['CAUCHY']
-ensemble_num = 2
+#ensemble_num = 2
 #channel_num = 5
 
 headers = ["Label", "kernel", "rep", "channel", "peaks", "aE_0", "errorE0", "aE_1", "errorE1"]
@@ -1401,7 +1410,7 @@ for index, ensemble in enumerate(ensembles):
     with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
-    #ensemble_num = index
+    ensemble_num = index
     for rep in reps:
         for k, channel in enumerate(mesonic_channels):
             for kernel in kerneltype:
@@ -1436,3 +1445,467 @@ for index, ensemble in enumerate(ensembles):
 
                     perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
                                     plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
+
+
+ensembles = ['M2']
+mesonic_channels = ['gi']
+reps = ['as']
+kerneltype = ['GAUSS', 'CAUCHY']
+ensemble_num = 1
+channel_num = 1
+ef2 = np.array([0.269, 0.473, 0.6098, 0.746, 0.814, 0.882, 0.950, 1.0868])
+ef1 = np.array([0.467, 0.5417, 0.6098, 0.678, 0.882, 1.019])
+
+for index, ensemble in enumerate(ensembles):
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(headers)
+    ensemble_num = index
+    for rep in reps:
+        for k, channel in enumerate(mesonic_channels):
+            for kernel in kerneltype:
+                for fit_peaks_switch in range(2):
+                    new_k_peaks = k_peaks[ensemble][k] + 1
+                    old_k_peaks = k_peaks[ensemble][k]
+                    channel_num = k
+                    if rep == 'as':
+                        channel_num += 6
+
+                    if kernel == 'GAUSS':
+                        cauchy_fit = False
+                    elif kernel == 'CAUCHY':
+                        cauchy_fit = True
+                    if k_peaks[ensemble][channel_num] == 2:  # kpeaks[ensemble][channel]
+                        triple_fit = False
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 3:
+                        triple_fit = True
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 4:
+                        triple_fit = True
+                        four_fit = True
+                    path = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/{channel}_{rep}/Logs/"
+                    file_path_input = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/fit_results.txt"
+                    wf1 = np.array([1.77, 2.83, 3.76, 4.18, 3.93, 2.21])
+                    wf2 = np.array([1.9, 4.97, 10.58, 10., 9., 9.28, 8.24, 4.06])
+                    if fit_peaks_switch == 0:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{old_k_peaks}.pdf"
+                    elif fit_peaks_switch == 1:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
+                    mf1 = 0.06
+                    mf2 = 0.05
+                    '''
+                    perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
+                    '''
+
+# Calculating the third columns
+wf1 *= 10**(-6)
+wf2 *= 10**(-6)
+third_col1 = mf1 * wf1
+third_col2 = mf2 * wf2
+
+# Creating the data to be written to files
+data1 = np.column_stack((ef1, wf1, third_col1))
+data2 = np.column_stack((ef2, wf2, third_col2))
+
+# Directory path
+output_dir = "../input_fit/Fig7"
+
+# Creating the directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# Filenames
+log_files = [
+    'sp_dens_datapoints_gauss.txt',
+    'sp_dens_datapoints_cauchy.txt'
+]
+
+# Save the data to files
+np.savetxt(f"{output_dir}/{log_files[0]}", data1, fmt='%.6e', comments='')
+np.savetxt(f"{output_dir}/{log_files[1]}", data2, fmt='%.6e', comments='')
+
+
+ensembles = ['M1']
+mesonic_channels = ['gi']
+reps = ['fund']
+kerneltype = ['GAUSS']
+ensemble_num = 1
+channel_num = 1
+ef2 = np.array([0.335, 0.44, 0.493, 0.545, 0.650, 0.755, 0.860])
+
+for index, ensemble in enumerate(ensembles):
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(headers)
+    ensemble_num = index
+    for rep in reps:
+        for k, channel in enumerate(mesonic_channels):
+            for kernel in kerneltype:
+                for fit_peaks_switch in range(2):
+                    new_k_peaks = k_peaks[ensemble][k] + 1
+                    old_k_peaks = k_peaks[ensemble][k]
+                    channel_num = k
+                    if rep == 'as':
+                        channel_num += 6
+
+                    if kernel == 'GAUSS':
+                        cauchy_fit = False
+                    elif kernel == 'CAUCHY':
+                        cauchy_fit = True
+                    if k_peaks[ensemble][channel_num] == 2:  # kpeaks[ensemble][channel]
+                        triple_fit = False
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 3:
+                        triple_fit = True
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 4:
+                        triple_fit = True
+                        four_fit = True
+                    path = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/{channel}_{rep}/Logs/"
+                    file_path_input = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/fit_results.txt"
+                    wf2 = np.array([2.37, 3.18, 3.13, 3.29, 3.61, 2.86, 1.16])
+                    if fit_peaks_switch == 0:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{old_k_peaks}.pdf"
+                    elif fit_peaks_switch == 1:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
+                    mf2 = 0.08
+                    '''
+                    perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
+                    '''
+
+wf2 *= 10**(-7)
+third_col2 = mf2 * wf2
+
+data2 = np.column_stack((ef2, wf2, third_col2))
+
+# Directory path
+output_dir = "../input_fit/Fig10"
+
+# Creating the directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# Filenames
+log_files = [
+    'sp_dens_datapoints_gauss.txt'
+]
+
+# Save the data to files
+np.savetxt(f"{output_dir}/{log_files[0]}", data2, fmt='%.6e', comments='')
+
+
+ensembles = ['M1']
+mesonic_channels = ['gi']
+reps = ['fund']
+kerneltype = ['GAUSS']
+ensemble_num = 1
+channel_num = 1
+ef2 = np.array([0.332, 0.374, 0.457, 0.541, 0.624, 0.665, 0.749, 0.832, 0.915])
+ef1 = np.array([0.33, 0.374, 0.416, 0.457, 0.499, 0.540, 0.582, 0.624, 0.665])
+
+for index, ensemble in enumerate(ensembles):
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(headers)
+    ensemble_num = index
+    for rep in reps:
+        for k, channel in enumerate(mesonic_channels):
+            for kernel in kerneltype:
+                for fit_peaks_switch in range(2):
+                    new_k_peaks = k_peaks[ensemble][k] + 1
+                    old_k_peaks = k_peaks[ensemble][k]
+                    channel_num = k
+                    if rep == 'as':
+                        channel_num += 6
+
+                    if kernel == 'GAUSS':
+                        cauchy_fit = False
+                    elif kernel == 'CAUCHY':
+                        cauchy_fit = True
+                    if k_peaks[ensemble][channel_num] == 2:  # kpeaks[ensemble][channel]
+                        triple_fit = False
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 3:
+                        triple_fit = True
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 4:
+                        triple_fit = True
+                        four_fit = True
+                    path = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/{channel}_{rep}/Logs/"
+                    file_path_input = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/fit_results.txt"
+                    wf1 = np.array([7.79, 9.75, 10.81, 11.96, 13.71, 15.5, 18.76, 21.3, 25.8])
+                    wf2 = np.array([1.54, 1.6, 1.81, 1.53, 1.23, 1.235, 1.18, 0.93, 0.53])
+                    if fit_peaks_switch == 0:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{old_k_peaks}.pdf"
+                    elif fit_peaks_switch == 1:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
+                    mf2 = [0.12, 0.27]
+                    mf1 = 0.08
+                    '''
+                    perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
+                    '''
+
+wf2 *= 10**(-8)
+wf1 *= 10**(-7)
+part1 = mf2[0] * wf2[:-5]
+part2 = mf2[1] * wf2[-5:]
+third_col2 = np.concatenate((part1, part2))
+third_col = mf1 * wf1
+
+data2 = np.column_stack((ef2, wf2, third_col2))
+data1 = np.column_stack((ef1, wf1, third_col))
+
+# Directory path
+output_dir = "../input_fit/Fig11"
+
+# Creating the directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# Filenames
+log_files = [
+    'sp_dens_datapoints_gauss_up.txt',
+    'sp_dens_datapoints_gauss_down.txt'
+]
+
+# Save the data to files
+np.savetxt(f"{output_dir}/{log_files[0]}", data1, fmt='%.6e', comments='')
+np.savetxt(f"{output_dir}/{log_files[1]}", data2, fmt='%.6e', comments='')
+
+ensembles = ['M1']
+mesonic_channels = ['gi']
+reps = ['fund']
+kerneltype = ['GAUSS']
+ensemble_num = 1
+channel_num = 1
+ef2 = np.array([0.125, 0.166, 0.25, 0.33, 0.416, 0.499, 0.582, 0.67, 0.749, 0.832, 0.915])
+
+for index, ensemble in enumerate(ensembles):
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(headers)
+    ensemble_num = index
+    for rep in reps:
+        for k, channel in enumerate(mesonic_channels):
+            for kernel in kerneltype:
+                for fit_peaks_switch in range(2):
+                    new_k_peaks = k_peaks[ensemble][k] + 1
+                    old_k_peaks = k_peaks[ensemble][k]
+                    channel_num = k
+                    if rep == 'as':
+                        channel_num += 6
+
+                    if kernel == 'GAUSS':
+                        cauchy_fit = False
+                    elif kernel == 'CAUCHY':
+                        cauchy_fit = True
+                    if k_peaks[ensemble][channel_num] == 2:  # kpeaks[ensemble][channel]
+                        triple_fit = False
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 3:
+                        triple_fit = True
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 4:
+                        triple_fit = True
+                        four_fit = True
+                    path = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/{channel}_{rep}/Logs/"
+                    file_path_input = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/fit_results.txt"
+                    wf2 = np.array([0.9, 1.04, 1.54, 2.22, 3.04, 3.98, 5.1, 5.93, 6.73, 7.13, 7.44])
+                    if fit_peaks_switch == 0:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{old_k_peaks}.pdf"
+                    elif fit_peaks_switch == 1:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
+                    mf2 = [0.07, 0.10]
+                    '''
+                    perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
+                    '''
+
+wf2 *= 10**(-6)
+part1 = mf2[0] * wf2[:-4]
+part2 = mf2[1] * wf2[-4:]
+third_col2 = np.concatenate((part1, part2))
+
+data2 = np.column_stack((ef2, wf2, third_col2))
+
+# Directory path
+output_dir = "../input_fit/Fig12"
+
+# Creating the directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# Filenames
+log_files = [
+    'sp_dens_datapoints_gauss.txt'
+]
+
+# Save the data to files
+np.savetxt(f"{output_dir}/{log_files[0]}", data2, fmt='%.6e', comments='')
+
+ensembles = ['M1']
+mesonic_channels = ['gi']
+reps = ['fund']
+kerneltype = ['GAUSS']
+ensemble_num = 1
+channel_num = 1
+ef2 = np.array([0.29, 0.33, 0.416, 0.499, 0.58, 0.67, 0.75])
+
+for index, ensemble in enumerate(ensembles):
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(headers)
+    ensemble_num = index
+    for rep in reps:
+        for k, channel in enumerate(mesonic_channels):
+            for kernel in kerneltype:
+                for fit_peaks_switch in range(2):
+                    new_k_peaks = k_peaks[ensemble][k] + 1
+                    old_k_peaks = k_peaks[ensemble][k]
+                    channel_num = k
+                    if rep == 'as':
+                        channel_num += 6
+
+                    if kernel == 'GAUSS':
+                        cauchy_fit = False
+                    elif kernel == 'CAUCHY':
+                        cauchy_fit = True
+                    if k_peaks[ensemble][channel_num] == 2:  # kpeaks[ensemble][channel]
+                        triple_fit = False
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 3:
+                        triple_fit = True
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 4:
+                        triple_fit = True
+                        four_fit = True
+                    path = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/{channel}_{rep}/Logs/"
+                    file_path_input = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/fit_results.txt"
+                    wf2 = np.array([5.36, 6.91, 9.03, 9.1, 9.8, 10.1, 9.36])
+                    if fit_peaks_switch == 0:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{old_k_peaks}.pdf"
+                    elif fit_peaks_switch == 1:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
+                    mf2 = [0.03, 0.06, 0.18]
+                    '''
+                    perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
+                    '''
+
+wf2 *= 10**(-13)
+part1 = mf2[0] * wf2[:-2]
+part2 = mf2[1] * wf2[-2:-1]
+part3 = mf2[2] * wf2[-1:]
+third_col2 = np.concatenate((part1, part2, part3))
+
+data2 = np.column_stack((ef2, wf2, third_col2))
+
+# Directory path
+output_dir = "../input_fit/Fig13"
+
+# Creating the directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# Filenames
+log_files = [
+    'sp_dens_datapoints_gauss.txt'
+]
+
+# Save the data to files
+np.savetxt(f"{output_dir}/{log_files[0]}", data2, fmt='%.6e', comments='')
+
+
+ensembles = ['M1', 'M2', 'M3']
+mesonic_channels = ['g5']
+reps = ['fund']
+kerneltype = ['GAUSS']
+ensemble_num = 1
+channel_num = 0
+ef2 = np.array([0.07, 0.18, 0.29, 0.40, 0.51, 0.62, 0.73, 0.84])
+ef1 = np.array([0.33, 0.4, 0.46, 0.51, 0.58, 0.697, 0.76, 0.87])
+ef3 = np.array([0.047, 0.16, 0.286, 0.4, 0.53, 0.66, 0.77, 0.91, 1.03])
+
+for index, ensemble in enumerate(ensembles):
+    with open(f'../CSVs/{ensemble}_spectral_density_spectrum.csv', 'a', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(headers)
+    ensemble_num = index
+    for rep in reps:
+        for k, channel in enumerate(mesonic_channels):
+            for kernel in kerneltype:
+                for fit_peaks_switch in range(2):
+                    new_k_peaks = k_peaks[ensemble][k] + 1
+                    old_k_peaks = k_peaks[ensemble][k]
+                    channel_num = k
+                    if rep == 'as':
+                        channel_num += 6
+
+                    if kernel == 'GAUSS':
+                        cauchy_fit = False
+                    elif kernel == 'CAUCHY':
+                        cauchy_fit = True
+                    if k_peaks[ensemble][channel_num] == 2:  # kpeaks[ensemble][channel]
+                        triple_fit = False
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 3:
+                        triple_fit = True
+                        four_fit = False
+                    elif k_peaks[ensemble][channel_num] == 4:
+                        triple_fit = True
+                        four_fit = True
+                    path = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/{channel}_{rep}/Logs/"
+                    file_path_input = f"../input_fit/{ensemble}/{channel}_{rep}/{kernel}/fit_results.txt"
+                    wf2 = np.array([0.065, 2.01, 6.45, 7.14, 7.31, 8.44, 4.67, 2.36])
+                    wf1 = np.array([4.01, 5.02, 4.91, 4.58, 5.05, 5., 2.85, 0.79])
+                    wf3 = np.array([0.078, 0.51, 1.77, 2.52, 1.93, 2.55, 3., 2.46, 1.47])
+                    if fit_peaks_switch == 0:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{old_k_peaks}.pdf"
+                    elif fit_peaks_switch == 1:
+                        output_name = f"./fitresults/fit_results_{ensemble}_{rep}_{channel}_{kernel}_kpeaks{new_k_peaks}.pdf"
+                    mf2 = [0.12, 0.27, 0.39]
+                    mf1 = [0.12, 0.23, 0.88]
+                    mf3 = [0.12, 0.13, 0.18]
+                    '''
+                    perform_fit(kernel,ensemble,rep,channel,ensemble_num, channel_num, path, file_path_input, output_name, plot_min_lim, plot_max_lim, cauchy_fit, triple_fit, four_fit, print_cov_matrix,
+                                    plot_cov_mat, plot_corr_mat, flag_chi2, matrix_4D, k_peaks[ensemble][channel_num], kernel, Nboot_fit[ensemble_num], fit_peaks_switch, matrix_2D)
+                    '''
+
+wf2 *= 10**(-7)
+part1 = mf2[0] * wf2[:-2]
+part2 = mf2[1] * wf2[-2:-1]
+part3 = mf2[2] * wf2[-1:]
+third_col2 = np.concatenate((part1, part2, part3))
+
+wf1 *= 10**(-7)
+wf3 *= 10**(-6)
+
+part1 = mf1[0] * wf1[:-2]
+part2 = mf1[1] * wf1[-2:-1]
+part3 = mf1[2] * wf1[-1:]
+third_col1 = np.concatenate((part1, part2, part3))
+part1 = mf3[0] * wf3[:-2]
+part2 = mf3[1] * wf3[-2:-1]
+part3 = mf3[2] * wf3[-1:]
+third_col3 = np.concatenate((part1, part2, part3))
+
+data2 = np.column_stack((ef2, wf2, third_col2))
+data1 = np.column_stack((ef1, wf1, third_col1))
+data3 = np.column_stack((ef3, wf3, third_col3))
+
+# Directory path
+output_dir = "../input_fit/Fig15"
+
+# Creating the directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# Filenames
+log_files = [
+    'sp_dens_datapoints_gauss_up.txt',
+    'sp_dens_datapoints_gauss_middle.txt',
+    'sp_dens_datapoints_gauss_down.txt'
+]
+
+# Save the data to files
+np.savetxt(f"{output_dir}/{log_files[0]}", data1, fmt='%.6e', comments='')
+np.savetxt(f"{output_dir}/{log_files[1]}", data2, fmt='%.6e', comments='')
+np.savetxt(f"{output_dir}/{log_files[2]}", data3, fmt='%.6e', comments='')
