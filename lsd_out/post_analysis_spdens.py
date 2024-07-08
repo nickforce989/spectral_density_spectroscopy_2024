@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Load the CSV file
-file_path = './CSVs/M2_spectral_density_spectrum.csv'
+file_path = '../CSVs/M2_spectral_density_spectrum.csv'
 df = pd.read_csv(file_path)
 
 # Extract the required columns
@@ -24,28 +24,28 @@ def write_to_file(filename, start_idx, end_idx, ae_col, err_col):
             file.write(line)
 
 # Ensure directories exist
-os.makedirs('./input_fit/systematic_errors', exist_ok=True)
+os.makedirs('../input_fit/systematic_errors', exist_ok=True)
 
 # Write the first half of ground state to spectrum_ground_fund.txt
-write_to_file('./input_fit/systematic_errors/spectrum_ground_fund.txt', 0, mid_point, aE_0, errorE0)
+write_to_file('../input_fit/systematic_errors/spectrum_ground_fund.txt', 0, mid_point, aE_0, errorE0)
 
 # Write the second half of ground state to spectrum_ground_as.txt
-write_to_file('input_fit/systematic_errors/spectrum_ground_as.txt', mid_point, len(df), aE_0, errorE0)
+write_to_file('../input_fit/systematic_errors/spectrum_ground_as.txt', mid_point, len(df), aE_0, errorE0)
 
 # Write the first half of first excited state to spectrum_first_fund.txt
-write_to_file('input_fit/systematic_errors/spectrum_first_fund.txt', 0, mid_point, aE_1, errorE1)
+write_to_file('../input_fit/systematic_errors/spectrum_first_fund.txt', 0, mid_point, aE_1, errorE1)
 
 # Write the second half of first excited state to spectrum_first_as.txt
-write_to_file('input_fit/systematic_errors/spectrum_first_as.txt', mid_point, len(df), aE_1, errorE1)
+write_to_file('../input_fit/systematic_errors/spectrum_first_as.txt', mid_point, len(df), aE_1, errorE1)
 
 #print('Files "spectrum_ground_fund.txt", "spectrum_ground_as.txt", "spectrum_first_fund.txt", and "spectrum_first_as.txt" have been created successfully.')
 
 
 # Define the file paths
 file_paths = {
-    "M1": './CSVs/M1_spectral_density_spectrum.csv',
-    "M2": './CSVs/M2_spectral_density_spectrum.csv',
-    "M3": './CSVs/M3_spectral_density_spectrum.csv'
+    "M1": '../CSVs/M1_spectral_density_spectrum.csv',
+    "M2": '../CSVs/M2_spectral_density_spectrum.csv',
+    "M3": '../CSVs/M3_spectral_density_spectrum.csv'
 }
 
 # Initialize a list to hold the results for the first line
@@ -101,8 +101,11 @@ for key, file_path in file_paths.items():
 # Join the results with spaces for the second line
 output_aE_1 = ' '.join(results_aE_1)
 
+# Ensure directories exist
+os.makedirs('../input_fit/improving_spectrum', exist_ok=True)
+
 # Write the results to the output file
-output_file_path = './input_fit/improving_spectrum/improving_spectrum_nt.txt'
+output_file_path = '../input_fit/improving_spectrum/improving_spectrum_nt.txt'
 with open(output_file_path, 'w') as f:
     f.write(output_aE_0 + '\n' + output_aE_1)
 
@@ -113,11 +116,11 @@ import pandas as pd
 
 # Define the file paths for each M file
 file_paths = {
-    "M1": './CSVs/M1_spectral_density_spectrum.csv',
-    "M2": './CSVs/M2_spectral_density_spectrum.csv',
-    "M3": './CSVs/M3_spectral_density_spectrum.csv',
-    "M4": './CSVs/M4_spectral_density_spectrum.csv',
-    "M5": './CSVs/M5_spectral_density_spectrum.csv'
+    "M1": '../CSVs/M1_spectral_density_spectrum.csv',
+    "M2": '../CSVs/M2_spectral_density_spectrum.csv',
+    "M3": '../CSVs/M3_spectral_density_spectrum.csv',
+    "M4": '../CSVs/M4_spectral_density_spectrum.csv',
+    "M5": '../CSVs/M5_spectral_density_spectrum.csv'
 }
 
 # Define the order of channels and reps
@@ -310,13 +313,15 @@ def process_spectrum(file_path):
         
     return results_aE_0, results_aE_1, results_aE_2
 
+# Ensure directories exist
+os.makedirs('../input_fit/final_spectrum', exist_ok=True)
 
 # Process each M file and write results to corresponding output files
 for key, file_path in file_paths.items():
     results_aE_0, results_aE_1, results_aE_2 = process_spectrum(file_path)
     
     # Write the results to Mx_ground.txt
-    output_file_path_ground = f'./input_fit/final_spectrum/{key}_ground.txt'
+    output_file_path_ground = f'../input_fit/final_spectrum/{key}_ground.txt'
     with open(output_file_path_ground, 'w') as f_ground:
         for channel, rep in order:
             if (channel, rep) in results_aE_0:
@@ -327,7 +332,7 @@ for key, file_path in file_paths.items():
     print(f"Results for {key}_ground.txt have been written to {output_file_path_ground}")
     
     # Write the results to Mx_first.txt
-    output_file_path_first = f'./input_fit/final_spectrum/{key}_first.txt'
+    output_file_path_first = f'../input_fit/final_spectrum/{key}_first.txt'
     with open(output_file_path_first, 'w') as f_first:
         for channel, rep in order:
             if (channel, rep) in results_aE_1:
@@ -338,7 +343,7 @@ for key, file_path in file_paths.items():
     print(f"Results for {key}_first.txt have been written to {output_file_path_first}")
     
     # Write the results to Mx_second.txt
-    output_file_path_second = f'./input_fit/final_spectrum/{key}_second.txt'
+    output_file_path_second = f'../input_fit/final_spectrum/{key}_second.txt'
     with open(output_file_path_second, 'w') as f_second:
         for channel, rep in order:
             if (channel, rep) in results_aE_2:
