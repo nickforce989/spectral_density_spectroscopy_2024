@@ -34,10 +34,6 @@ Maurizio Piai, Davide Vadacchino.
 
       conda activate analysis-env
 
-* Then, install ``julia`` using conda
-
-      conda install -c conda-forge julia
-
 ## Code usage
 
 * The whole analysis can be done automatically:
