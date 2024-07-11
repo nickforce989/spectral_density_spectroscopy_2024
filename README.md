@@ -24,7 +24,9 @@ Maurizio Piai, Davide Vadacchino.
 
 * Then, create the conda environment in terminal with conda installed:
 
-      conda env create -f environment.yml
+  ```shellsession
+  $ conda env create -f environment.yml
+  ```
   
   with the caveat that if you're using an Apple silicon CPU then you need to use Conda 24.3 or later, and specify ```--platform osx-64```
   in your ```conda env create``` call.
@@ -32,27 +34,35 @@ Maurizio Piai, Davide Vadacchino.
 
 * Once the environment is created, you can active the it:
 
-      conda activate analysis-env
+  ```shellsession
+  $ conda activate analysis-env
+  ```
 
 * If you will be running on a machine without internet access,
   for example, a compute node of a cluster,
   then you should also instantiate the necessary Julia environment
   by running
 
-      cd just_plotting/code/topologies/MadrasSokal/
-      julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
-      cd -
+  ```shellsession
+  $ cd just_plotting/code/topologies/MadrasSokal/
+  $ julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
+  $ cd -
+  ```
 
   If Julia raises errors about missing or inconsistent libraries,
   you may need to manually point it at your conda environment.
   Use
 
-      which julia
+  ```shellsession
+  $ which julia
+  ```
 
   to identify the path to your Julia executable.
   Then run
 
-      export LD_LIBRARY_PATH=/path/to/conda/environment/lib:${LD_LIBRARY_PATH}
+  ```shellsession
+  $ export LD_LIBRARY_PATH=/path/to/conda/environment/lib:${LD_LIBRARY_PATH}
+  ```
 
   where `/path/to/conda/environment` is the output of the previous command
   up to but not including the trailing `/bin/julia`.
