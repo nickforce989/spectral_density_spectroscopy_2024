@@ -34,6 +34,29 @@ Maurizio Piai, Davide Vadacchino.
 
       conda activate analysis-env
 
+* If you will be running on a machine without internet access,
+  for example, a compute node of a cluster,
+  then you should also instantiate the necessary Julia environment
+  by running
+
+      cd just_plotting/code/topologies/MadrasSokal/
+      julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
+      cd -
+
+  If Julia raises errors about missing or inconsistent libraries,
+  you may need to manually point it at your conda environment.
+  Use
+
+      which julia
+
+  to identify the path to your Julia executable.
+  Then run
+
+      export LD_LIBRARY_PATH=/path/to/conda/environment/lib:${LD_LIBRARY_PATH}
+
+  where `/path/to/conda/environment` is the output of the previous command
+  up to but not including the trailing `/bin/julia`.
+
 ## Code usage
 
 * The whole analysis can be done automatically:
